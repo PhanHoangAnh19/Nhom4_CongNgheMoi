@@ -58,7 +58,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/shop', function () {
     // 1. Lấy tất cả sản phẩm trong database và nhóm lại theo cột 'brand' (hãng)
     // Chính dòng này sẽ tạo ra biến $categories mà giao diện đang đòi hỏi
-    $categories = Product::all()->groupBy('brand');
+    $categories = \App\Models\Product::all()->groupBy('brand');
 
     // 2. Trả về view và đính kèm biến $categories theo
     return view('client.index', compact('categories'));
