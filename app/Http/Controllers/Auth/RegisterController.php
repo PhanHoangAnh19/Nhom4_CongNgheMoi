@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\SendOTPNotification;
+use App\Mail\WelcomeMail; // ✅ THÊM DÒNG NÀY
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail; // ✅ THÊM DÒNG NÀY
 use Carbon\Carbon;
 
 class RegisterController extends Controller
@@ -43,7 +45,6 @@ class RegisterController extends Controller
 
         return redirect()->route('otp.view')
             ->with('message', 'Mã OTP đã được gửi về email của bạn.');
-
     }
 
     // ===== FORM NHẬP OTP =====
@@ -79,11 +80,22 @@ class RegisterController extends Controller
             return redirect()->route('register');
         }
 
+        // Cập nhật email_verified_at
         $user->email_verified_at = now();
         $user->save();
 
+        // ✅ GỬI WELCOME EMAIL SAU KHI VERIFY THÀNH CÔNG
+        try {
+            Mail::to($user->email)->send(new WelcomeMail($user));
+        } catch (\Exception $e) {
+            // Log lỗi nhưng không làm gián đoạn flow đăng ký
+            \Log::error('Lỗi gửi welcome email: ' . $e->getMessage());
+        }
+
+        // Login user
         Auth::login($user);
 
+        // Xóa session OTP
         session()->forget([
             'register_otp',
             'register_email',
@@ -91,7 +103,7 @@ class RegisterController extends Controller
             'register_otp_sent_at',
         ]);
 
-        return redirect('/home')->with('success', 'Xác thực thành công 🎉');
+        return redirect('/home')->with('success', 'Xác thực thành công 🎉 Chúng tôi đã gửi email chào mừng đến bạn!');
     }
 
     // ===== RESEND OTP (CHỐNG SPAM) =====
@@ -101,7 +113,7 @@ class RegisterController extends Controller
             return redirect()->route('register');
         }
 
-        $lastSent = \Carbon\Carbon::parse(session('register_otp_sent_at'));
+        $lastSent = Carbon::parse(session('register_otp_sent_at'));
         $diff = now()->diffInSeconds($lastSent);
 
         if ($diff < self::OTP_RESEND_SECONDS) {
@@ -109,14 +121,16 @@ class RegisterController extends Controller
             return back()->withErrors(['otp' => "Vui lòng chờ {$remain} giây trước khi gửi lại OTP."]);
         }
 
-        $user = \App\Models\User::where('email', session('register_email'))->first();
-        if (!$user)
+        $user = User::where('email', session('register_email'))->first();
+        if (!$user) {
             return redirect()->route('register');
+        }
 
         $this->sendOtp($user);
 
         return back()->with('message', 'Đã gửi lại mã OTP mới.');
     }
+
     // ===== HÀM GỬI OTP (DÙNG CHUNG) =====
     private function sendOtp(User $user)
     {
