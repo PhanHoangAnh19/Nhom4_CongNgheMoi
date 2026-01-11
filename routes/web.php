@@ -1,15 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Models\Product;
-use App\Http\Controllers\HomeController;
+use App\Models\Product; // ← THÊM DÒNG NÀY
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\MailController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\MailController;
-use App\Http\Controllers\UserRegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,13 +16,9 @@ use App\Http\Controllers\UserRegisterController;
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    if (!auth()->check()) {
-        return redirect()->route('landing');
-    }
-
-    return auth()->user()->role === 'admin'
-        ? redirect()->route('home')
-        : redirect()->route('shop.index');
+    return auth()->check()
+        ? redirect()->route('admin.home')
+        : redirect()->route('landing');
 });
 
 /*
@@ -35,12 +30,15 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/landing', fn () => view('auth.landing'))->name('landing');
 
+    // Login
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
 
+    // Register
     Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
 
+    // OTP
     Route::get('/verify-otp', [RegisterController::class, 'showVerifyOtpForm'])->name('otp.view');
     Route::post('/verify-otp', [RegisterController::class, 'verifyOtp'])->name('otp.verify');
     Route::post('/resend-otp', [RegisterController::class, 'resendOtp'])->name('otp.resend');
@@ -60,14 +58,35 @@ Route::post('/logout', [LoginController::class, 'logout'])
 | ADMIN
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['auth']) // sau này có thể thêm 'admin'
+    ->group(function () {
 
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
+        // Dashboard
+        Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-    Route::get('/products/thong-ke', [ProductController::class, 'thongKe'])
-        ->name('products.thongke');
+        // Products (ADMIN)
+        Route::get('/products/thong-ke', [ProductController::class, 'thongKe'])
+            ->name('products.thongke');
 
-    Route::resource('products', ProductController::class);
+        Route::resource('products', ProductController::class);
+});
+
+/*
+|--------------------------------------------------------------------------
+| CLIENT / SHOP
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+
+    Route::get('/shop', function () {
+        // Lấy tất cả sản phẩm và group theo brand
+        $categories = Product::all()->groupBy('brand');
+        
+        // Truyền $categories vào view
+        return view('client.index', compact('categories'));
+    })->name('shop.index');
 });
 
 /*
@@ -75,61 +94,29 @@ Route::middleware(['auth', 'admin'])->group(function () {
 | CART
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')->group(function () {
+Route::get('/home-test', function () { // Đổi tên tạm để tránh trùng lặp
+    $categories = [
+        'Laptop' => \App\Models\Product::where('brand', 'Dell')->take(4)->get(),
+        'Điện thoại' => \App\Models\Product::where('brand', 'Apple')->take(4)->get(),
+        'Phụ kiện' => \App\Models\Product::where('brand', 'Logitech')->take(4)->get(),
+    ];
+    return view('home', compact('categories'));
+})->name('home.test');
 
-    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
-    Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
-    Route::delete('/cart/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
-    Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+// Giỏ hàng routes - Phải đặt trong middleware auth
+Route::middleware('auth')->prefix('cart')->name('cart.')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::post('/add/{product}', [CartController::class, 'add'])->name('add'); // ← ĐÚNG
+    Route::post('/update', [CartController::class, 'update'])->name('update');
+    Route::delete('/remove/{product}', [CartController::class, 'remove'])->name('remove'); // Sửa {id} thành {product}
+    Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
 });
 
-/*
-|--------------------------------------------------------------------------
-| CHECKOUT
-|--------------------------------------------------------------------------
-*/
-Route::middleware('auth')->group(function () {
-
-    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-    Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
-    Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
-});
-
-/*
-|--------------------------------------------------------------------------
-| SHOP
-|--------------------------------------------------------------------------
-*/
-Route::middleware('auth')->group(function () {
-
-    Route::get('/shop', function () {
-        $categories = Product::all()->groupBy('brand');
-        return view('client.index', compact('categories'));
-    })->name('shop.index');
-});
-
-/*
-|--------------------------------------------------------------------------
-| REGISTER USER (RIÊNG)
-|--------------------------------------------------------------------------
-*/
-Route::middleware('guest')->group(function () {
-
-    Route::get('/register-user', [UserRegisterController::class, 'showForm'])
-        ->name('user.register');
-
-    Route::post('/register-user', [UserRegisterController::class, 'register'])
-        ->name('user.register.submit');
-
-    Route::get('/verify-user-otp', [UserRegisterController::class, 'showVerifyOtpForm'])
-        ->name('user.otp.view');
-
-    Route::post('/verify-user-otp', [UserRegisterController::class, 'verifyOtp'])
-        ->name('user.otp.verify');
-
-    Route::post('/resend-user-otp', [UserRegisterController::class, 'resendOtp'])
-        ->name('user.otp.resend');
+// Thanh toán routes - Phải đặt trong middleware auth
+Route::middleware('auth')->prefix('checkout')->name('checkout.')->group(function () {
+    Route::get('/', [CheckoutController::class, 'index'])->name('index');
+    Route::post('/process', [CheckoutController::class, 'process'])->name('process');
+    Route::get('/success/{id}', [CheckoutController::class, 'success'])->name('success');
 });
 
 /*

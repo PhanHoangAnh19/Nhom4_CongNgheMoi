@@ -2,24 +2,20 @@
 
 namespace App\View\Components;
 
-use Closure;
-use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
 class AddToCartButton extends Component
 {
-    /**
-     * Create a new component instance.
-     */
-    public function __construct()
+    public $productId;
+    public $quantity;
+
+    public function __construct($productId, $quantity = 1)
     {
-        //
+        $this->productId = $productId;
+        $this->quantity = $quantity;
     }
 
-    /**
-     * Get the view / contents that represent the component.
-     */
-    public function render(): View|Closure|string
+    public function render()
     {
         return view('components.add-to-cart-button');
     }

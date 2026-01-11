@@ -1,15 +1,15 @@
-@extends('layouts.client')
 
-@section('title', 'Giỏ hàng - Nhóm 4 CNM')
 
-@section('content')
+<?php $__env->startSection('title', 'Giỏ hàng - Nhóm 4 CNM'); ?>
+
+<?php $__env->startSection('content'); ?>
 <!-- BREADCRUMB -->
 <div id="breadcrumb" class="section">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
                 <ul class="breadcrumb-tree">
-                    <li><a href="{{ url('/') }}">Trang chủ</a></li>
+                    <li><a href="<?php echo e(url('/')); ?>">Trang chủ</a></li>
                     <li class="active">Giỏ hàng</li>
                 </ul>
             </div>
@@ -21,71 +21,71 @@
 <!-- SECTION -->
 <div class="section">
     <div class="container">
-        @if(empty($cart))
+        <?php if(empty($cart)): ?>
             <div class="row">
                 <div class="col-md-12">
                     <div class="text-center" style="padding: 80px 0;">
                         <i class="fa fa-shopping-cart" style="font-size: 100px; color: #ddd; margin-bottom: 20px;"></i>
                         <h3 style="color: #666; margin-bottom: 10px;">Giỏ hàng trống</h3>
                         <p style="color: #999; margin-bottom: 30px;">Bạn chưa có sản phẩm nào trong giỏ hàng</p>
-                        <a href="{{ url('/') }}" class="primary-btn" style="display: inline-block; padding: 12px 40px;">
+                        <a href="<?php echo e(url('/')); ?>" class="primary-btn" style="display: inline-block; padding: 12px 40px;">
                             <i class="fa fa-arrow-left"></i> Tiếp tục mua sắm
                         </a>
                     </div>
                 </div>
             </div>
-        @else
+        <?php else: ?>
             <div class="row">
                 <!-- Danh sách sản phẩm -->
                 <div class="col-md-8">
                     <div class="order-summary">
                         <div class="order-col">
-                            <div><strong>SẢN PHẨM ({{ count($cart) }})</strong></div>
+                            <div><strong>SẢN PHẨM (<?php echo e(count($cart)); ?>)</strong></div>
                         </div>
                     </div>
 
-                    @foreach($cart as $id => $item)
+                    <?php $__currentLoopData = $cart; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $id => $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="product-widget" style="border-bottom: 1px solid #E4E7ED; padding: 20px 0; display: flex; align-items: center;">
                             <div class="product-img" style="flex: 0 0 100px;">
-                                <img src="{{ asset($item['image']) }}" alt="{{ $item['name'] }}" style="width: 100px; height: 100px; object-fit: cover;">
+                                <img src="<?php echo e(asset($item['image'])); ?>" alt="<?php echo e($item['name']); ?>" style="width: 100px; height: 100px; object-fit: cover;">
                             </div>
                             
                             <div class="product-body" style="flex: 1; padding-left: 20px;">
                                 <h3 class="product-name">
-                                    <a href="#">{{ $item['name'] }}</a>
+                                    <a href="#"><?php echo e($item['name']); ?></a>
                                 </h3>
                                 <p style="font-size: 12px; color: #999; margin: 5px 0;">
-                                    @if(isset($item['brand']) && $item['brand'] != 'N/A')
-                                        <span><strong>Hãng:</strong> {{ $item['brand'] }}</span>
-                                    @endif
-                                    @if(isset($item['ram']) && $item['ram'] != 'N/A')
-                                        <span> | <strong>RAM:</strong> {{ $item['ram'] }}</span>
-                                    @endif
-                                    @if(isset($item['storage']) && $item['storage'] != 'N/A')
-                                        <span> | <strong>Bộ nhớ:</strong> {{ $item['storage'] }}</span>
-                                    @endif
-                                    @if(isset($item['color']) && $item['color'] != 'N/A')
-                                        <br><span><strong>Màu:</strong> {{ $item['color'] }}</span>
-                                    @endif
+                                    <?php if(isset($item['brand']) && $item['brand'] != 'N/A'): ?>
+                                        <span><strong>Hãng:</strong> <?php echo e($item['brand']); ?></span>
+                                    <?php endif; ?>
+                                    <?php if(isset($item['ram']) && $item['ram'] != 'N/A'): ?>
+                                        <span> | <strong>RAM:</strong> <?php echo e($item['ram']); ?></span>
+                                    <?php endif; ?>
+                                    <?php if(isset($item['storage']) && $item['storage'] != 'N/A'): ?>
+                                        <span> | <strong>Bộ nhớ:</strong> <?php echo e($item['storage']); ?></span>
+                                    <?php endif; ?>
+                                    <?php if(isset($item['color']) && $item['color'] != 'N/A'): ?>
+                                        <br><span><strong>Màu:</strong> <?php echo e($item['color']); ?></span>
+                                    <?php endif; ?>
                                 </p>
                                 <h4 class="product-price" style="color: #D10024; font-weight: 700; margin-top: 10px;">
-                                    {{ number_format($item['price'], 0, ',', '.') }}₫
-                                    @if(isset($item['stock']))
+                                    <?php echo e(number_format($item['price'], 0, ',', '.')); ?>₫
+                                    <?php if(isset($item['stock'])): ?>
                                         <span style="font-size: 11px; color: #4CAF50; display: block; margin-top: 5px;">
-                                            <i class="fa fa-check-circle"></i> Còn {{ $item['stock'] }} sản phẩm
+                                            <i class="fa fa-check-circle"></i> Còn <?php echo e($item['stock']); ?> sản phẩm
                                         </span>
-                                    @endif
+                                    <?php endif; ?>
                                 </h4>
                             </div>
 
                             <div style="flex: 0 0 150px; text-align: center;">
                                 <div class="input-number" style="display: inline-block;">
                                     <input type="number" 
-                                           value="{{ $item['quantity'] }}" 
+                                           value="<?php echo e($item['quantity']); ?>" 
                                            min="1" 
                                            class="quantity-input"
-                                           data-id="{{ $id }}"
-                                           data-price="{{ $item['price'] }}"
+                                           data-id="<?php echo e($id); ?>"
+                                           data-price="<?php echo e($item['price']); ?>"
                                            style="width: 80px; padding: 5px; text-align: center; border: 1px solid #E4E7ED;">
                                     <span class="qty-up" style="cursor: pointer; margin-left: 5px;">
                                         <i class="fa fa-angle-up"></i>
@@ -97,27 +97,27 @@
                             </div>
 
                             <div style="flex: 0 0 120px; text-align: right;">
-                                <h4 class="subtotal" data-id="{{ $id }}" style="color: #2B2D42; font-weight: 700; margin-bottom: 10px;">
-                                    {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}₫
+                                <h4 class="subtotal" data-id="<?php echo e($id); ?>" style="color: #2B2D42; font-weight: 700; margin-bottom: 10px;">
+                                    <?php echo e(number_format($item['price'] * $item['quantity'], 0, ',', '.')); ?>₫
                                 </h4>
-                                <form action="{{ route('cart.remove', $id) }}" method="POST" style="display: inline;">
-                                    @csrf
-                                    @method('DELETE')
+                                <form action="<?php echo e(route('cart.remove', $id)); ?>" method="POST" style="display: inline;">
+                                    <?php echo csrf_field(); ?>
+                                    <?php echo method_field('DELETE'); ?>
                                     <button type="submit" class="delete" style="border: none; background: none; cursor: pointer; color: #D10024;">
                                         <i class="fa fa-trash"></i> Xóa
                                     </button>
                                 </form>
                             </div>
                         </div>
-                    @endforeach
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
                     <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
-                        <a href="{{ url('/') }}" style="color: #2B2D42;">
+                        <a href="<?php echo e(url('/')); ?>" style="color: #2B2D42;">
                             <i class="fa fa-arrow-left"></i> Tiếp tục mua sắm
                         </a>
-                        <form action="{{ route('cart.clear') }}" method="POST">
-                            @csrf
-                            @method('DELETE')
+                        <form action="<?php echo e(route('cart.clear')); ?>" method="POST">
+                            <?php echo csrf_field(); ?>
+                            <?php echo method_field('DELETE'); ?>
                             <button type="submit" class="primary-btn" style="background: #999;" 
                                     onclick="return confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?')">
                                 <i class="fa fa-trash"></i> Xóa toàn bộ
@@ -135,7 +135,7 @@
                         
                         <div class="order-col" style="padding: 20px 0; border-bottom: 1px solid #E4E7ED;">
                             <div>Tạm tính:</div>
-                            <div><strong id="cart-total">{{ number_format($total, 0, ',', '.') }}₫</strong></div>
+                            <div><strong id="cart-total"><?php echo e(number_format($total, 0, ',', '.')); ?>₫</strong></div>
                         </div>
                         
                         <div class="order-col" style="padding: 20px 0; border-bottom: 1px solid #E4E7ED;">
@@ -147,12 +147,12 @@
                             <div><strong>TỔNG CỘNG:</strong></div>
                             <div>
                                 <strong class="order-total" id="final-total" style="color: #D10024; font-size: 24px;">
-                                    {{ number_format($total, 0, ',', '.') }}₫
+                                    <?php echo e(number_format($total, 0, ',', '.')); ?>₫
                                 </strong>
                             </div>
                         </div>
                         
-                        <a href="{{ route('checkout.index') }}" class="primary-btn order-submit" style="width: 100%; text-align: center; padding: 15px;">
+                        <a href="<?php echo e(route('checkout.index')); ?>" class="primary-btn order-submit" style="width: 100%; text-align: center; padding: 15px;">
                             Thanh toán <i class="fa fa-arrow-circle-right"></i>
                         </a>
 
@@ -162,12 +162,12 @@
                     </div>
                 </div>
             </div>
-        @endif
+        <?php endif; ?>
     </div>
 </div>
 <!-- /SECTION -->
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 $(document).ready(function() {
     // Xử lý thay đổi số lượng
@@ -199,10 +199,10 @@ $(document).ready(function() {
         var price = input.data('price');
 
         $.ajax({
-            url: '{{ route("cart.update") }}',
+            url: '<?php echo e(route("cart.update")); ?>',
             method: 'POST',
             data: {
-                _token: '{{ csrf_token() }}',
+                _token: '<?php echo e(csrf_token()); ?>',
                 product_id: productId,
                 quantity: quantity
             },
@@ -222,9 +222,9 @@ $(document).ready(function() {
     }
 });
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@push('styles')
+<?php $__env->startPush('styles'); ?>
 <style>
 .product-widget {
     transition: background-color 0.3s;
@@ -249,5 +249,6 @@ $(document).ready(function() {
     color: white;
 }
 </style>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.client', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Nhom4_CongNgheMoi\resources\views/cart/index.blade.php ENDPATH**/ ?>

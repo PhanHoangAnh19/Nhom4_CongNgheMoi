@@ -1,16 +1,16 @@
-@extends('layouts.client')
 
-@section('title', 'Thanh toán - Nhóm 4 CNM')
 
-@section('content')
+<?php $__env->startSection('title', 'Thanh toán - Nhóm 4 CNM'); ?>
+
+<?php $__env->startSection('content'); ?>
 <!-- BREADCRUMB -->
 <div id="breadcrumb" class="section">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
                 <ul class="breadcrumb-tree">
-                    <li><a href="{{ url('/') }}">Trang chủ</a></li>
-                    <li><a href="{{ route('cart.index') }}">Giỏ hàng</a></li>
+                    <li><a href="<?php echo e(url('/')); ?>">Trang chủ</a></li>
+                    <li><a href="<?php echo e(route('cart.index')); ?>">Giỏ hàng</a></li>
                     <li class="active">Thanh toán</li>
                 </ul>
             </div>
@@ -22,8 +22,8 @@
 <!-- SECTION -->
 <div class="section">
     <div class="container">
-        <form action="{{ route('checkout.process') }}" method="POST">
-            @csrf
+        <form action="<?php echo e(route('checkout.process')); ?>" method="POST">
+            <?php echo csrf_field(); ?>
             <div class="row">
                 <!-- Thông tin thanh toán -->
                 <div class="col-md-7">
@@ -37,12 +37,19 @@
                             <input class="input" 
                                    type="text" 
                                    name="customer_name" 
-                                   value="{{ old('customer_name', $user->name ?? '') }}"
+                                   value="<?php echo e(old('customer_name', $user->name ?? '')); ?>"
                                    placeholder="Nhập họ và tên"
                                    required>
-                            @error('customer_name')
-                                <span style="color: #D10024; font-size: 12px;">{{ $message }}</span>
-                            @enderror
+                            <?php $__errorArgs = ['customer_name'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span style="color: #D10024; font-size: 12px;"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <div class="form-group">
@@ -50,12 +57,19 @@
                             <input class="input" 
                                    type="email" 
                                    name="customer_email" 
-                                   value="{{ old('customer_email', $user->email ?? '') }}"
+                                   value="<?php echo e(old('customer_email', $user->email ?? '')); ?>"
                                    placeholder="email@example.com"
                                    required>
-                            @error('customer_email')
-                                <span style="color: #D10024; font-size: 12px;">{{ $message }}</span>
-                            @enderror
+                            <?php $__errorArgs = ['customer_email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span style="color: #D10024; font-size: 12px;"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <div class="form-group">
@@ -63,12 +77,19 @@
                             <input class="input" 
                                    type="tel" 
                                    name="customer_phone" 
-                                   value="{{ old('customer_phone') }}"
+                                   value="<?php echo e(old('customer_phone')); ?>"
                                    placeholder="0123456789"
                                    required>
-                            @error('customer_phone')
-                                <span style="color: #D10024; font-size: 12px;">{{ $message }}</span>
-                            @enderror
+                            <?php $__errorArgs = ['customer_phone'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span style="color: #D10024; font-size: 12px;"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <div class="form-group">
@@ -76,12 +97,19 @@
                             <input class="input" 
                                    type="text" 
                                    name="shipping_address" 
-                                   value="{{ old('shipping_address') }}"
+                                   value="<?php echo e(old('shipping_address')); ?>"
                                    placeholder="Số nhà, tên đường"
                                    required>
-                            @error('shipping_address')
-                                <span style="color: #D10024; font-size: 12px;">{{ $message }}</span>
-                            @enderror
+                            <?php $__errorArgs = ['shipping_address'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span style="color: #D10024; font-size: 12px;"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <div class="form-group">
@@ -89,7 +117,7 @@
                             <input class="input" 
                                    type="text" 
                                    name="ward" 
-                                   value="{{ old('ward') }}"
+                                   value="<?php echo e(old('ward')); ?>"
                                    placeholder="Nhập phường/xã">
                         </div>
 
@@ -98,7 +126,7 @@
                             <input class="input" 
                                    type="text" 
                                    name="district" 
-                                   value="{{ old('district') }}"
+                                   value="<?php echo e(old('district')); ?>"
                                    placeholder="Nhập quận/huyện">
                         </div>
 
@@ -106,15 +134,22 @@
                             <label>Tỉnh/Thành phố <span style="color: #D10024;">*</span></label>
                             <select class="input" name="city" required>
                                 <option value="">Chọn tỉnh/thành phố</option>
-                                <option value="Hà Nội" {{ old('city') == 'Hà Nội' ? 'selected' : '' }}>Hà Nội</option>
-                                <option value="Hồ Chí Minh" {{ old('city') == 'Hồ Chí Minh' ? 'selected' : '' }}>Hồ Chí Minh</option>
-                                <option value="Đà Nẵng" {{ old('city') == 'Đà Nẵng' ? 'selected' : '' }}>Đà Nẵng</option>
-                                <option value="Hải Phòng" {{ old('city') == 'Hải Phòng' ? 'selected' : '' }}>Hải Phòng</option>
-                                <option value="Cần Thơ" {{ old('city') == 'Cần Thơ' ? 'selected' : '' }}>Cần Thơ</option>
+                                <option value="Hà Nội" <?php echo e(old('city') == 'Hà Nội' ? 'selected' : ''); ?>>Hà Nội</option>
+                                <option value="Hồ Chí Minh" <?php echo e(old('city') == 'Hồ Chí Minh' ? 'selected' : ''); ?>>Hồ Chí Minh</option>
+                                <option value="Đà Nẵng" <?php echo e(old('city') == 'Đà Nẵng' ? 'selected' : ''); ?>>Đà Nẵng</option>
+                                <option value="Hải Phòng" <?php echo e(old('city') == 'Hải Phòng' ? 'selected' : ''); ?>>Hải Phòng</option>
+                                <option value="Cần Thơ" <?php echo e(old('city') == 'Cần Thơ' ? 'selected' : ''); ?>>Cần Thơ</option>
                             </select>
-                            @error('city')
-                                <span style="color: #D10024; font-size: 12px;">{{ $message }}</span>
-                            @enderror
+                            <?php $__errorArgs = ['city'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <span style="color: #D10024; font-size: 12px;"><?php echo e($message); ?></span>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <div class="form-group">
@@ -122,7 +157,7 @@
                             <textarea class="input" 
                                       name="note" 
                                       rows="4"
-                                      placeholder="Ghi chú về đơn hàng, ví dụ: thời gian hay chỉ dẫn địa điểm giao hàng chi tiết hơn">{{ old('note') }}</textarea>
+                                      placeholder="Ghi chú về đơn hàng, ví dụ: thời gian hay chỉ dẫn địa điểm giao hàng chi tiết hơn"><?php echo e(old('note')); ?></textarea>
                         </div>
                     </div>
 
@@ -137,7 +172,8 @@
                                    name="payment_method" 
                                    id="payment-cod" 
                                    value="cod" 
-                                   {{ old('payment_method', 'cod') == 'cod' ? 'checked' : '' }}
+                                   <?php echo e(old('payment_method', 'cod') == 'cod' ? 'checked' : ''); ?>
+
                                    required>
                             <label for="payment-cod">
                                 <span></span>
@@ -153,7 +189,7 @@
                                    name="payment_method" 
                                    id="payment-bank" 
                                    value="bank_transfer"
-                                   {{ old('payment_method') == 'bank_transfer' ? 'checked' : '' }}>
+                                   <?php echo e(old('payment_method') == 'bank_transfer' ? 'checked' : ''); ?>>
                             <label for="payment-bank">
                                 <span></span>
                                 Chuyển khoản ngân hàng
@@ -168,7 +204,7 @@
                                    name="payment_method" 
                                    id="payment-card" 
                                    value="credit_card"
-                                   {{ old('payment_method') == 'credit_card' ? 'checked' : '' }}>
+                                   <?php echo e(old('payment_method') == 'credit_card' ? 'checked' : ''); ?>>
                             <label for="payment-card">
                                 <span></span>
                                 Thanh toán bằng thẻ
@@ -178,9 +214,16 @@
                             </div>
                         </div>
                         
-                        @error('payment_method')
-                            <span style="color: #D10024; font-size: 12px;">{{ $message }}</span>
-                        @enderror
+                        <?php $__errorArgs = ['payment_method'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                            <span style="color: #D10024; font-size: 12px;"><?php echo e($message); ?></span>
+                        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                     </div>
                 </div>
 
@@ -198,32 +241,36 @@
                             </div>
                             
                             <div class="order-products" style="max-height: 300px; overflow-y: auto;">
-                                @foreach($cart as $item)
+                                <?php $__currentLoopData = $cart; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <div class="order-col">
                                         <div>
-                                            {{ $item['quantity'] }}x {{ Str::limit($item['name'], 30) }}
+                                            <?php echo e($item['quantity']); ?>x <?php echo e(Str::limit($item['name'], 30)); ?>
+
                                             <div style="font-size: 11px; color: #999;">
-                                                @if(isset($item['ram']) && $item['ram'] != 'N/A')
-                                                    {{ $item['ram'] }}
-                                                @endif
-                                                @if(isset($item['storage']) && $item['storage'] != 'N/A')
-                                                    @if(isset($item['ram']) && $item['ram'] != 'N/A') | @endif
-                                                    {{ $item['storage'] }}
-                                                @endif
-                                                @if(isset($item['color']) && $item['color'] != 'N/A')
-                                                    @if((isset($item['ram']) && $item['ram'] != 'N/A') || (isset($item['storage']) && $item['storage'] != 'N/A')) | @endif
-                                                    Màu: {{ $item['color'] }}
-                                                @endif
+                                                <?php if(isset($item['ram']) && $item['ram'] != 'N/A'): ?>
+                                                    <?php echo e($item['ram']); ?>
+
+                                                <?php endif; ?>
+                                                <?php if(isset($item['storage']) && $item['storage'] != 'N/A'): ?>
+                                                    <?php if(isset($item['ram']) && $item['ram'] != 'N/A'): ?> | <?php endif; ?>
+                                                    <?php echo e($item['storage']); ?>
+
+                                                <?php endif; ?>
+                                                <?php if(isset($item['color']) && $item['color'] != 'N/A'): ?>
+                                                    <?php if((isset($item['ram']) && $item['ram'] != 'N/A') || (isset($item['storage']) && $item['storage'] != 'N/A')): ?> | <?php endif; ?>
+                                                    Màu: <?php echo e($item['color']); ?>
+
+                                                <?php endif; ?>
                                             </div>
                                         </div>
-                                        <div>{{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}₫</div>
+                                        <div><?php echo e(number_format($item['price'] * $item['quantity'], 0, ',', '.')); ?>₫</div>
                                     </div>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                             
                             <div class="order-col">
                                 <div>Tạm tính</div>
-                                <div><strong>{{ number_format($total, 0, ',', '.') }}₫</strong></div>
+                                <div><strong><?php echo e(number_format($total, 0, ',', '.')); ?>₫</strong></div>
                             </div>
                             
                             <div class="order-col">
@@ -233,7 +280,7 @@
                             
                             <div class="order-col">
                                 <div><strong>TỔNG CỘNG</strong></div>
-                                <div><strong class="order-total">{{ number_format($total, 0, ',', '.') }}₫</strong></div>
+                                <div><strong class="order-total"><?php echo e(number_format($total, 0, ',', '.')); ?>₫</strong></div>
                             </div>
                         </div>
                         
@@ -257,7 +304,7 @@
 </div>
 <!-- /SECTION -->
 
-@push('styles')
+<?php $__env->startPush('styles'); ?>
 <style>
 .billing-details .form-group {
     margin-bottom: 20px;
@@ -308,5 +355,6 @@
     border-radius: 50%;
 }
 </style>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.client', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\Nhom4_CongNgheMoi\resources\views/checkout/index.blade.php ENDPATH**/ ?>

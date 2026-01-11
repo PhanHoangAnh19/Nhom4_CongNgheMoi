@@ -21,4 +21,8 @@ class Product extends Model
         'storage',  // Thêm cột này
         'color'     // Thêm cột này
     ];
+    protected $casts = [
+        'quantity' => 'integer',
+        'price' => 'float',
+    ];
 }
