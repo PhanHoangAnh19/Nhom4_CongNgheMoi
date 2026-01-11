@@ -1,121 +1,147 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProductController;
+use App\Models\Product;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\MailController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\MailController;
+use App\Http\Controllers\UserRegisterController;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| ROOT
 |--------------------------------------------------------------------------
 */
-
-// ================= ROOT =================
-// Trang gốc: nếu login → home, chưa login → landing
 Route::get('/', function () {
-    return auth()->check()
+    if (!auth()->check()) {
+        return redirect()->route('landing');
+    }
+
+    return auth()->user()->role === 'admin'
         ? redirect()->route('home')
-        : redirect()->route('landing');
+        : redirect()->route('shop.index');
 });
 
-// ================= AUTH =================
-Route::get('/landing', function () {
-    return view('auth.landing');
-})->name('landing');
+/*
+|--------------------------------------------------------------------------
+| AUTH (GUEST)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('guest')->group(function () {
 
-// ---------- LOGIN ----------
-Route::get('/login', [LoginController::class, 'showLoginForm'])
-    ->middleware('guest')
-    ->name('login');
+    Route::get('/landing', fn () => view('auth.landing'))->name('landing');
 
-Route::post('/login', [LoginController::class, 'login'])
-    ->middleware('guest');
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
 
-// ---------- REGISTER ----------
-Route::get('/register', [RegisterController::class, 'showRegisterForm'])
-    ->middleware('guest')
-    ->name('register');
+    Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register']);
 
-Route::post('/register', [RegisterController::class, 'register'])
-    ->middleware('guest');
+    Route::get('/verify-otp', [RegisterController::class, 'showVerifyOtpForm'])->name('otp.view');
+    Route::post('/verify-otp', [RegisterController::class, 'verifyOtp'])->name('otp.verify');
+    Route::post('/resend-otp', [RegisterController::class, 'resendOtp'])->name('otp.resend');
+});
 
-// ---------- OTP ----------
-Route::get('/verify-otp', [RegisterController::class, 'showVerifyOtpForm'])
-    ->middleware('guest')
-    ->name('otp.view');
-
-Route::post('/verify-otp', [RegisterController::class, 'verifyOtp'])
-    ->middleware('guest')
-    ->name('otp.verify');
-
-// RESEND OTP
-Route::post('/resend-otp', [RegisterController::class, 'resendOtp'])
-    ->middleware('guest')
-    ->name('otp.resend');
-
-// ---------- LOGOUT ----------
+/*
+|--------------------------------------------------------------------------
+| LOGOUT
+|--------------------------------------------------------------------------
+*/
 Route::post('/logout', [LoginController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
-// ================= AUTHENTICATED =================
+/*
+|--------------------------------------------------------------------------
+| ADMIN
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'admin'])->group(function () {
 
-// ---------- HOME ----------
-Route::get('/home', [HomeController::class, 'index'])
-    ->middleware('auth')
-    ->name('home');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-// ---------- PRODUCTS ----------
-Route::resource('products', ProductController::class)
-    ->middleware('auth');
+    Route::get('/products/thong-ke', [ProductController::class, 'thongKe'])
+        ->name('products.thongke');
 
-// ================= CART =================
-// Routes cho giỏ hàng
-Route::get('/cart', [CartController::class, 'index'])
-    ->middleware('auth')
-    ->name('cart.index');
-
-Route::post('/cart/add/{product}', [CartController::class, 'add'])
-    ->middleware('auth')
-    ->name('cart.add');
-
-Route::post('/cart/update', [CartController::class, 'update'])
-    ->middleware('auth')
-    ->name('cart.update');
-
-Route::delete('/cart/remove/{product}', [CartController::class, 'remove'])
-    ->middleware('auth')
-    ->name('cart.remove');
-
-Route::delete('/cart/clear', [CartController::class, 'clear'])
-    ->middleware('auth')
-    ->name('cart.clear');
-
-// ================= CHECKOUT =================
-// Routes cho thanh toán (yêu cầu đăng nhập)
-Route::middleware(['auth'])->group(function () {
-    Route::get('/checkout', [CheckoutController::class, 'index'])
-        ->name('checkout.index');
-
-    Route::post('/checkout/process', [CheckoutController::class, 'process'])
-        ->name('checkout.process');
-
-    Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])
-        ->name('checkout.success');
+    Route::resource('products', ProductController::class);
 });
 
-// ================= MAIL =================
+/*
+|--------------------------------------------------------------------------
+| CART
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+    Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+});
+
+/*
+|--------------------------------------------------------------------------
+| CHECKOUT
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
+    Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
+});
+
+/*
+|--------------------------------------------------------------------------
+| SHOP
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+
+    Route::get('/shop', function () {
+        $categories = Product::all()->groupBy('brand');
+        return view('client.index', compact('categories'));
+    })->name('shop.index');
+});
+
+/*
+|--------------------------------------------------------------------------
+| REGISTER USER (RIÊNG)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('guest')->group(function () {
+
+    Route::get('/register-user', [UserRegisterController::class, 'showForm'])
+        ->name('user.register');
+
+    Route::post('/register-user', [UserRegisterController::class, 'register'])
+        ->name('user.register.submit');
+
+    Route::get('/verify-user-otp', [UserRegisterController::class, 'showVerifyOtpForm'])
+        ->name('user.otp.view');
+
+    Route::post('/verify-user-otp', [UserRegisterController::class, 'verifyOtp'])
+        ->name('user.otp.verify');
+
+    Route::post('/resend-user-otp', [UserRegisterController::class, 'resendOtp'])
+        ->name('user.otp.resend');
+});
+
+/*
+|--------------------------------------------------------------------------
+| MAIL
+|--------------------------------------------------------------------------
+*/
 Route::get('/test-email', [MailController::class, 'showTestForm'])
     ->name('mail.test.form');
 
 Route::post('/test-email/send', [MailController::class, 'sendTestEmail'])
     ->name('mail.test.send');
 
-// Gửi welcome email cho user
 Route::get('/send-welcome/{userId}', [MailController::class, 'sendWelcomeEmail'])
     ->name('mail.welcome');
