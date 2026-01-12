@@ -17,7 +17,7 @@ use App\Http\Controllers\CheckoutController;
 */
 Route::get('/', function () {
     return auth()->check()
-        ? redirect()->route('admin.home')
+        ? redirect()->route('home')
         : redirect()->route('landing');
 });
 
@@ -55,36 +55,25 @@ Route::post('/logout', [LoginController::class, 'logout'])
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN
+| HOME + PRODUCTS (AUTH)
 |--------------------------------------------------------------------------
 */
-Route::prefix('admin')
-    ->name('admin.')
-    ->middleware(['auth'])
-    ->group(function () {
+Route::middleware('auth')->group(function () {
 
-        // Dashboard
-        Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-        // Products (ADMIN)
-        Route::get('/products/thong-ke', [ProductController::class, 'thongKe'])
-            ->name('products.thongke');
-
-        Route::resource('products', ProductController::class);
+    Route::resource('products', ProductController::class);
 });
 
 /*
 |--------------------------------------------------------------------------
-| CLIENT / SHOP
+| SHOP
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
 
     Route::get('/shop', function () {
-        // Lấy tất cả sản phẩm và group theo brand
         $categories = Product::all()->groupBy('brand');
-        
-        // Truyền $categories vào view
         return view('client.index', compact('categories'));
     })->name('shop.index');
 });
@@ -94,16 +83,6 @@ Route::middleware('auth')->group(function () {
 | CART
 |--------------------------------------------------------------------------
 */
-Route::get('/home-test', function () {
-    $categories = [
-        'Laptop' => \App\Models\Product::where('brand', 'Dell')->take(4)->get(),
-        'Điện thoại' => \App\Models\Product::where('brand', 'Apple')->take(4)->get(),
-        'Phụ kiện' => \App\Models\Product::where('brand', 'Logitech')->take(4)->get(),
-    ];
-    return view('home', compact('categories'));
-})->name('home.test');
-
-// Giỏ hàng routes - Phải đặt trong middleware auth
 Route::middleware('auth')->prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
     Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
@@ -112,11 +91,14 @@ Route::middleware('auth')->prefix('cart')->name('cart.')->group(function () {
     Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
 });
 
-// Thanh toán routes - Phải đặt trong middleware auth
+/*
+|--------------------------------------------------------------------------
+| CHECKOUT
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth')->prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/process', [CheckoutController::class, 'process'])->name('process');
-    // THAY ĐỔI TỪ {id} THÀNH {orderId} ĐỂ KHỚP VỚI CONTROLLER
     Route::get('/success/{orderId}', [CheckoutController::class, 'success'])->name('success');
 });
 
@@ -133,3 +115,18 @@ Route::post('/test-email/send', [MailController::class, 'sendTestEmail'])
 
 Route::get('/send-welcome/{userId}', [MailController::class, 'sendWelcomeEmail'])
     ->name('mail.welcome');
+
+/*
+|--------------------------------------------------------------------------
+| CHI TIẾT SẢN PHẨM
+|--------------------------------------------------------------------------
+*/
+Route::get('/san-pham/{id}', [ProductController::class, 'show'])
+    ->name('product.show');
+
+Route::get('/danh-muc/{id}', function ($id) {
+    $products = Product::where('brand', ucfirst(str_replace('-', ' ', $id)))
+        ->paginate(12);
+
+    return view('shop.category', compact('products', 'id'));
+})->name('shop.category');

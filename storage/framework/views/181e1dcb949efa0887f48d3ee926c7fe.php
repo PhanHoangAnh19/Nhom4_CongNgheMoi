@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Giỏ hàng - Nhóm 4 CNM'); ?>
 
 <?php $__env->startSection('content'); ?>

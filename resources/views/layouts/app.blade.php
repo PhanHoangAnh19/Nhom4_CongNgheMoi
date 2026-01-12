@@ -75,16 +75,17 @@
             <ul class="list-unstyled components">
                 <div class="sidebar-heading">Bảng điều khiển</div>
                 <li class="{{ Request::is('admin/home') ? 'active' : '' }}">
-                    <a href="{{ route('admin.home') }}"><i class="fas fa-home"></i> Dashboard</a>
+                    {{-- Sửa: Dùng url() thay vì route() để tránh lỗi sập trang nếu chưa định nghĩa name --}}
+                    <a href="{{ url('/admin/home') }}"><i class="fas fa-home"></i> Dashboard</a>
                 </li>
 
                 <div class="sidebar-heading">Cửa hàng</div>
                 <li class="{{ Request::is('admin/products') ? 'active' : '' }}">
-                    <a href="{{ route('admin.products.index') }}"><i class="fas fa-mobile-alt"></i> Quản lý điện thoại</a>
+                    <a href="{{ url('/admin/products') }}"><i class="fas fa-mobile-alt"></i> Quản lý điện thoại</a>
                 </li>
 
                 <li class="{{ Request::is('admin/products/thong-ke') ? 'active' : '' }}">
-                    <a href="{{ route('admin.products.thongke') }}">
+                    <a href="{{ url('/admin/products/thong-ke') }}">
                         <i class="fas fa-chart-pie"></i> Biểu đồ thống kê
                     </a>
                 </li>
@@ -93,9 +94,16 @@
                 
                 <div class="sidebar-heading">Giao diện khách</div>
                 <li>
-                    <a href="{{ route('shop.index') }}" class="text-warning fw-bold">
-                        <i class="fas fa-shopping-bag"></i> Xem trang Shop
-                    </a>
+                    {{-- Bọc trong @if để tránh lỗi nếu Route shop.index chưa có --}}
+                    @if(Route::has('shop.index'))
+                        <a href="{{ route('shop.index') }}" class="text-warning fw-bold">
+                            <i class="fas fa-shopping-bag"></i> Xem trang Shop
+                        </a>
+                    @else
+                        <a href="{{ url('/') }}" class="text-warning fw-bold">
+                            <i class="fas fa-shopping-bag"></i> Xem trang Shop
+                        </a>
+                    @endif
                 </li>
             </ul>
         </nav>
@@ -104,7 +112,7 @@
             <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm py-3">
                 <div class="container-fluid">
                     <span class="navbar-text text-muted d-none d-md-block">
-                        Chào mừng bạn quay lại, quản trị viên!
+                        Chào mừng bạn quay lại, <strong>{{ Auth::check() ? Auth::user()->name : 'Quản trị viên' }}</strong>!
                     </span>
 
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -135,6 +143,14 @@
             </nav>
 
             <main class="py-4 px-4">
+                {{-- Hiển thị thông báo thành công/lỗi chung cho toàn bộ trang Admin --}}
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
                 @yield('content')
             </main>
         </div>
