@@ -9,7 +9,6 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\MailController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
-
 /*
 |--------------------------------------------------------------------------
 | ROOT
@@ -115,3 +114,20 @@ Route::post('/test-email/send', [MailController::class, 'sendTestEmail'])
 
 Route::get('/send-welcome/{userId}', [MailController::class, 'sendWelcomeEmail'])
     ->name('mail.welcome');
+/*
+|--------------------------------------------------------------------------
+| CHI TIẾT SẢN PHẨM
+|--------------------------------------------------------------------------
+*/
+// Giả sử bạn có controller này
+
+// Route chi tiết sản phẩm (slug để thân thiện URL)
+Route::get('/san-pham/{id}', [ProductController::class, 'show'])->name('product.show');
+
+// Route::get('/danh-muc/{slug}', [App\Http\Controllers\ShopController::class, 'category'])
+//    ->name('shop.category');
+
+Route::get('/danh-muc/{id}', function ($id) {
+    $products = Product::where('brand', ucfirst(str_replace('-', ' ', $id)))->paginate(12);
+    return view('shop.category', compact('products', 'id'));
+})->name('shop.category');

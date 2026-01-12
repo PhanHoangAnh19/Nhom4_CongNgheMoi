@@ -142,9 +142,11 @@
                 <div class="mb-50">
                     <div class="category-title-box">
                         <h3 class="title">{{ $categoryName }}</h3>
-                        <a href="#" class="text-danger fw-bold">Xem tất cả <i class="fa fa-angle-right"></i></a>
+                        <!-- SỬA: Link "Xem tất cả" - giả sử bạn có route lọc theo category -->
+                        <a href="{{ route('shop.category', Str::slug($categoryName)) }}" class="text-danger fw-bold">
+                            Xem tất cả <i class="fa fa-angle-right"></i>
+                        </a>
                     </div>
-
                     <div class="row">
                         @foreach($productList as $item)
                         <div class="col-md-3 col-sm-6 col-xs-6 mb-30">
@@ -153,16 +155,33 @@
                                     <span class="label-new">{{ $item->quantity > 0 ? 'MỚI' : 'HẾT HÀNG' }}</span>
                                 </div>
                                 
-                                <div class="product-img-box">
-                                    {{-- Đảm bảo đường dẫn asset($item->image) là chính xác --}}
+                                <!-- Ảnh sản phẩm - CLICK MỞ MODAL -->
+                                <div class="product-img-box" style="cursor: pointer;"
+                                    data-bs-toggle="modal" data-bs-target="#productModal"
+                                    data-name="{{ $item->name }}"
+                                    data-brand="{{ $item->brand }}"
+                                    data-price="{{ number_format($item->price, 0, ',', '.') }}₫"
+                                    data-stock="{{ $item->quantity > 0 ? 'Sẵn hàng (' . $item->quantity . ')' : 'Hết hàng' }}"
+                                    data-image="{{ asset($item->image) }}"
+                                    data-description="{{ $item->description ?? 'Chưa có mô tả chi tiết' }}">
                                     <img src="{{ asset($item->image) }}" alt="{{ $item->name }}" onerror="this.src='{{ asset('img/no-image.png') }}'">
                                 </div>
 
                                 <div class="product-body text-center" style="flex: 1;">
                                     <p class="text-muted small mb-1">{{ $item->brand }}</p>
-                                    <h3 class="h6 fw-bold mb-2">
-                                        <a href="#" class="text-dark text-decoration-none">{{ Str::limit($item->name, 35) }}</a>
+                                    
+                                    <!-- Tên sản phẩm - CLICK MỞ MODAL -->
+                                    <h3 class="h6 fw-bold mb-2" style="cursor: pointer;"
+                                        data-bs-toggle="modal" data-bs-target="#productModal"
+                                        data-name="{{ $item->name }}"
+                                        data-brand="{{ $item->brand }}"
+                                        data-price="{{ number_format($item->price, 0, ',', '.') }}₫"
+                                        data-stock="{{ $item->quantity > 0 ? 'Sẵn hàng (' . $item->quantity . ')' : 'Hết hàng' }}"
+                                        data-image="{{ asset($item->image) }}"
+                                        data-description="{{ $item->description ?? 'Chưa có mô tả chi tiết' }}">
+                                        {{ Str::limit($item->name, 35) }}
                                     </h3>
+                                    
                                     <h4 class="text-danger fw-extrabold mb-3">
                                         {{ number_format($item->price, 0, ',', '.') }}₫
                                     </h4>

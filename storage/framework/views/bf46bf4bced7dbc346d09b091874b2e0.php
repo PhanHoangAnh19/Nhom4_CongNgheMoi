@@ -6,14 +6,234 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo $__env->yieldContent('title', 'Nhóm 4 CNM'); ?></title>
 
+    <!-- Font Montserrat -->
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700" rel="stylesheet">
-    <link type="text/css" rel="stylesheet" href="<?php echo e(asset('css/bootstrap.min.css')); ?>" />
+
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <!-- Các CSS cũ của template -->
     <link type="text/css" rel="stylesheet" href="<?php echo e(asset('css/slick.css')); ?>" />
     <link type="text/css" rel="stylesheet" href="<?php echo e(asset('css/slick-theme.css')); ?>" />
     <link type="text/css" rel="stylesheet" href="<?php echo e(asset('css/nouislider.min.css')); ?>" />
     <link rel="stylesheet" href="<?php echo e(asset('css/font-awesome.min.css')); ?>">
     <link type="text/css" rel="stylesheet" href="<?php echo e(asset('css/style.css')); ?>" />
-    
+
+    <!-- CSS fix layout bể -->
+    <style>
+        .header-search {
+        display: flex;
+        align-items: center;
+    }
+
+    .header-search form {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        gap: 0; /* Xóa khoảng cách thừa */
+    }
+
+    .header-search .input-select {
+        width: 220px !important; /* Rộng hơn để chữ "Tất cả danh mục" không bị che */
+        height: 46px !important;
+        padding: 0 10px !important;
+        border: 1px solid #ddd !important;
+        border-right: none !important;
+        border-radius: 40px 0 0 40px !important;
+        font-size: 14px !important;
+        background: #fff !important;
+        color: #333 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    .header-search .input {
+        flex: 1 !important;
+        height: 46px !important;
+        border: 1px solid #ddd !important;
+        border-left: none !important;
+        border-right: none !important;
+        padding: 0 15px !important;
+        font-size: 14px !important;
+        border-radius: 0 !important;
+    }
+
+    .header-search .search-btn {
+        height: 46px !important;
+        width: 120px !important;
+        background: #D10024 !important;
+        color: white !important;
+        border: none !important;
+        font-weight: bold !important;
+        border-radius: 0 40px 40px 0 !important;
+        padding: 0 20px !important;
+        transition: background 0.3s !important;
+    }
+
+    .header-search .search-btn:hover {
+        background: #b8001f !important;
+    }
+
+    /* Fix trên mobile: cuộn ngang nếu cần */
+    @media (max-width: 991px) {
+        .header-search form {
+            flex-wrap: nowrap !important;
+        }
+        .header-search .input-select {
+            width: 160px !important; /* Giảm nhẹ trên mobile */
+        }
+    }
+        /* Fix top-header trôi xuống, giữ trên line xám */
+        #top-header {
+            background: #15161D;
+            color: #fff;
+            padding: 10px 0;
+        }
+        #top-header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #top-header .header-links {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        #top-header .header-links li {
+            display: inline-block;
+            margin-right: 20px;
+        }
+        #top-header .header-links.pull-right {
+            margin-left: auto;
+        }
+        #navigation {
+        background: #ffffff !important; /* Màu nền trắng */
+        border-bottom: 1px solid #e0e0e0 !important; /* Đường viền dưới nhẹ */
+        padding: 0 !important;
+    }
+
+    #responsive-nav {
+        overflow: hidden;
+    }
+
+    #navigation .main-nav.nav.navbar-nav {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: center !important; /* Chữ nằm giữa */
+        align-items: center !important;
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    #navigation .main-nav li {
+        margin: 0 15px !important; /* Khoảng cách đều giữa các item */
+        padding: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    #navigation .main-nav li a {
+        color: #333 !important; /* Chữ đen */
+        padding: 15px 10px !important;
+        font-size: 15px !important;
+        text-decoration: none !important;
+        display: block !important;
+        transition: 0.3s !important;
+        white-space: nowrap !important;
+        position: relative !important;
+    }
+
+    #navigation .main-nav li a:hover,
+    #navigation .main-nav li.active a {
+        color: #D10024 !important; /* Màu đỏ khi hover/active */
+    }
+
+    #navigation .main-nav li.active a::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 70%;
+        height: 3px;
+        background: #D10024 !important;
+        border-radius: 3px 3px 0 0;
+    }
+
+    /* Responsive: mobile cuộn ngang nếu cần */
+    @media (max-width: 991px) {
+        #responsive-nav {
+            overflow-x: auto !important;
+            white-space: nowrap !important;
+            padding: 10px 0 !important;
+        }
+        #navigation .main-nav {
+            justify-content: flex-start !important; /* Trên mobile bắt đầu từ trái để cuộn */
+        }
+    }
+
+    /* Không cho chữ xuống dòng */
+    #navigation .main-nav li a {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: 140px !important; /* Giới hạn chiều rộng chữ nếu quá dài */
+    }
+        /* Fix tìm kiếm xuống dòng */
+        .header-search form {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .header-search .input-select,
+        .header-search .input,
+        .header-search .search-btn {
+            height: 40px;
+            border-radius: 0;
+        }
+        .header-search .input-select {
+            width: 180px;
+        }
+        .header-search .input {
+            flex: 1;
+        }
+        .header-search .search-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0 20px;
+        }
+
+        /* Fix banner và Collection về hàng ngang */
+        .shop-banner {
+            margin-bottom: 0;
+        }
+        .section .row {
+            margin: 0 -15px;
+        }
+        .section .col-md-4,
+        .section .col-xs-6 {
+            padding: 0 15px;
+        }
+        @media (max-width: 767px) {
+            .section .col-xs-6 {
+                width: 50%;
+                float: left;
+            }
+        }
+
+        /* Fix modal đẹp hơn */
+        #productModal .modal-content {
+            border-radius: 15px;
+        }
+        #productModal img {
+            max-height: 400px;
+            object-fit: contain;
+        }
+    </style>
+
     <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 <body>
@@ -331,7 +551,10 @@
 
     <!-- jQuery Plugins -->
     <script src="<?php echo e(asset('js/jquery.min.js')); ?>"></script>
-    <script src="<?php echo e(asset('js/bootstrap.min.js')); ?>"></script>
+
+    <!-- Bootstrap 5 JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
     <script src="<?php echo e(asset('js/slick.min.js')); ?>"></script>
     <script src="<?php echo e(asset('js/nouislider.min.js')); ?>"></script>
     <script src="<?php echo e(asset('js/jquery.zoom.min.js')); ?>"></script>
@@ -343,7 +566,65 @@
             $('.alert').fadeOut('slow');
         }, 5000);
     </script>
-    
+
+    <!-- Modal Chi tiết sản phẩm -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalLabel">Chi tiết sản phẩm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <img id="modalProductImage" src="" alt="Sản phẩm" class="img-fluid rounded shadow">
+                        </div>
+                        <div class="col-md-6">
+                            <h4 id="modalProductName" class="fw-bold mb-3"></h4>
+                            <p><strong>Hãng:</strong> <span id="modalProductBrand"></span></p>
+                            <p><strong>Giá:</strong> <span id="modalProductPrice" class="text-danger fs-4 fw-bold"></span></p>
+                            <p><strong>Tồn kho:</strong> <span id="modalProductStock"></span></p>
+                            <p id="modalProductDescription" class="text-muted mt-3"></p>
+
+                            <div class="mt-4">
+                                <button id="modalAddToCart" class="btn btn-primary btn-block mb-2">Thêm vào giỏ</button>
+                                <button class="btn btn-success btn-block">Mua ngay</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript để điền dữ liệu vào modal -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const productModal = document.getElementById('productModal');
+
+        productModal.addEventListener('show.bs.modal', function (event) {
+            const trigger = event.relatedTarget;
+
+            if (!trigger) return;
+
+            const name = trigger.getAttribute('data-name') || 'Không có tên';
+            const brand = trigger.getAttribute('data-brand') || 'N/A';
+            const price = trigger.getAttribute('data-price') || 'N/A';
+            const stock = trigger.getAttribute('data-stock') || 'N/A';
+            const image = trigger.getAttribute('data-image') || '<?php echo e(asset('img/no-image.png')); ?>';
+            const description = trigger.getAttribute('data-description') || 'Chưa có mô tả chi tiết';
+
+            document.getElementById('modalProductName').textContent = name;
+            document.getElementById('modalProductBrand').textContent = brand;
+            document.getElementById('modalProductPrice').textContent = price;
+            document.getElementById('modalProductStock').textContent = stock;
+            document.getElementById('modalProductImage').src = image;
+            document.getElementById('modalProductDescription').textContent = description;
+        });
+    });
+    </script>
+
     <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 </html><?php /**PATH C:\xampp\htdocs\Nhom4_CongNgheMoi\resources\views/layouts/client.blade.php ENDPATH**/ ?>

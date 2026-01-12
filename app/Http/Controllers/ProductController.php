@@ -30,7 +30,7 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|max:255',
-            'brand' => 'required', 
+            'brand' => 'required',
             'price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -49,7 +49,7 @@ class ProductController extends Controller
         }
 
         Product::create($data);
-        
+
         return redirect()->route('admin.products.index')->with('success', 'Đã thêm điện thoại mới thành công!');
     }
 
@@ -107,15 +107,15 @@ class ProductController extends Controller
     /**
      * TRANG THỐNG KÊ
      */
-    public function thongKe() 
+    public function thongKe()
     {
         $dataQuantity = Product::select('brand', DB::raw('count(*) as total'))
-                        ->groupBy('brand')
-                        ->get();
+            ->groupBy('brand')
+            ->get();
 
         $dataRevenue = Product::select('brand', DB::raw('SUM(price * quantity) as total_revenue'))
-                        ->groupBy('brand')
-                        ->get();
+            ->groupBy('brand')
+            ->get();
 
         $totalAllRevenue = Product::sum(DB::raw('price * quantity'));
 
@@ -126,5 +126,25 @@ class ProductController extends Controller
             'revValues' => $dataRevenue->pluck('total_revenue')->toArray(),
             'totalAllRevenue' => $totalAllRevenue,
         ]);
+    }
+
+    /**
+     * TRANG CHI TIẾT SẢN PHẨM (FRONTEND)
+     */
+    /**
+     * TRANG CHI TIẾT SẢN PHẨM (FRONTEND)
+     */
+    public function show($id)  // Thay $slug thành $id
+    {
+        // Tìm sản phẩm theo ID (dùng findOrFail thay vì where slug)
+        $product = Product::findOrFail($id);
+
+        // Sản phẩm liên quan (cùng brand, trừ bản thân, lấy 8 cái)
+        $relatedProducts = Product::where('brand', $product->brand)
+            ->where('id', '!=', $product->id)
+            ->take(8)
+            ->get();
+
+        return view('products.show', compact('product', 'relatedProducts'));
     }
 }
