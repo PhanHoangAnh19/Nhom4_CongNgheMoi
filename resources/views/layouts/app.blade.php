@@ -28,6 +28,7 @@
             color: #fff;
             transition: all 0.3s;
             box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
         }
         #sidebar .sidebar-header { 
             padding: 25px 20px; 
@@ -75,13 +76,12 @@
             <ul class="list-unstyled components">
                 <div class="sidebar-heading">Bảng điều khiển</div>
                 <li class="{{ Request::is('admin/home') ? 'active' : '' }}">
-                    {{-- Sửa: Dùng url() thay vì route() để tránh lỗi sập trang nếu chưa định nghĩa name --}}
-                    <a href="{{ url('/admin/home') }}"><i class="fas fa-home"></i> Dashboard</a>
+                    <a href="{{ url('/home') }}"><i class="fas fa-home"></i> Dashboard</a>
                 </li>
 
-                <div class="sidebar-heading">Cửa hàng</div>
+                <div class="sidebar-heading">Quản lý kho hàng</div>
                 <li class="{{ Request::is('admin/products') ? 'active' : '' }}">
-                    <a href="{{ url('/admin/products') }}"><i class="fas fa-mobile-alt"></i> Quản lý điện thoại</a>
+<a href="{{ url('/admin/products') }}"><i class="fas fa-mobile-alt"></i> Quản lý điện thoại</a>
                 </li>
 
                 <li class="{{ Request::is('admin/products/thong-ke') ? 'active' : '' }}">
@@ -89,18 +89,24 @@
                         <i class="fas fa-chart-pie"></i> Biểu đồ thống kê
                     </a>
                 </li>
+
+                <div class="sidebar-heading">Bán hàng</div>
+                <li class="{{ Request::is('admin/orders*') ? 'active' : '' }}">
+                    <a href="{{ url('/admin/orders') }}">
+                        <i class="fas fa-history"></i> Lịch sử giao dịch
+                    </a>
+                </li>
                 
                 <hr style="border-color: #343a40; margin: 20px 0;">
                 
                 <div class="sidebar-heading">Giao diện khách</div>
                 <li>
-                    {{-- Bọc trong @if để tránh lỗi nếu Route shop.index chưa có --}}
                     @if(Route::has('shop.index'))
                         <a href="{{ route('shop.index') }}" class="text-warning fw-bold">
                             <i class="fas fa-shopping-bag"></i> Xem trang Shop
                         </a>
                     @else
-                        <a href="{{ url('/') }}" class="text-warning fw-bold">
+                        <a href="{{ url('/shop') }}" class="text-warning fw-bold">
                             <i class="fas fa-shopping-bag"></i> Xem trang Shop
                         </a>
                     @endif
@@ -129,7 +135,7 @@
                                     <div class="dropdown-menu dropdown-menu-end shadow border-0">
                                         <a class="dropdown-item py-2" href="#"
                                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                            <i class="fas fa-sign-out-alt me-2 text-danger"></i> Đăng xuất
+<i class="fas fa-sign-out-alt me-2 text-danger"></i> Đăng xuất
                                         </a>
                                         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                             @csrf
@@ -143,7 +149,6 @@
             </nav>
 
             <main class="py-4 px-4">
-                {{-- Hiển thị thông báo thành công/lỗi chung cho toàn bộ trang Admin --}}
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         <i class="fas fa-check-circle me-2"></i> {{ session('success') }}

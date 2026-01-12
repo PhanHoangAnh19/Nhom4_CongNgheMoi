@@ -302,12 +302,21 @@
                     <div class="col-md-3 clearfix">
                         <div class="header-ctn">
                             <!-- Wishlist -->
+                            <!-- Wishlist -->
                             <div>
-                                <a href="#">
-                                    <i class="fa fa-heart-o"></i>
-                                    <span>Yêu thích</span>
-                                    <div class="qty">0</div>
-                                </a>
+                                @if(auth()->check())
+                                    <a href="{{ route('admin.home') }}">
+                                        <i class="fa fa-heart-o"></i>
+                                        <span>Yêu thích</span>
+                                        <div class="qty">0</div>
+                                    </a>
+                                @else
+                                    <a href="{{ route('login') }}">
+                                        <i class="fa fa-heart-o"></i>
+                                        <span>Yêu thích</span>
+                                        <div class="qty">0</div>
+                                    </a>
+                                @endif
                             </div>
                             <!-- /Wishlist -->
 

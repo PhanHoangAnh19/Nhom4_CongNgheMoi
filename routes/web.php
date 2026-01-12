@@ -168,3 +168,6 @@ Route::get('/danh-muc/{id}', function ($id) {
 Route::post('cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
 
 
+// lịch sử giao dịch
+Route::get('/orders', [CheckoutController::class, 'adminOrders'])->name('orders.index');
+Route::get('/orders/{id}', [CheckoutController::class, 'adminOrderDetail'])->name('orders.show');
