@@ -28,6 +28,12 @@ Route::get('/landing', fn() => view('auth.landing'))->name('landing')->middlewar
 |--------------------------------------------------------------------------
 */
 Route::middleware('guest')->group(function () {
+
+
+    Route::get('/landing', fn() => view('auth.landing'))->name('landing');
+
+    // Login
+
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
     Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
@@ -42,6 +48,19 @@ Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->
 /*
 |--------------------------------------------------------------------------
 | USER & SHOP ROUTES (Dành cho khách hàng)
+| HOME + PRODUCTS (AUTH)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    Route::resource('products', ProductController::class);
+});
+
+/*
+|--------------------------------------------------------------------------
+| SHOP
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
@@ -100,6 +119,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 | MAIL & TEST
 |--------------------------------------------------------------------------
 */
+
 Route::get('/test-email', [MailController::class, 'showTestForm'])->name('mail.test.form');
 Route::post('/test-email/send', [MailController::class, 'sendTestEmail'])->name('mail.test.send');
 Route::get('/send-welcome/{userId}', [MailController::class, 'sendWelcomeEmail'])->name('mail.welcome');
@@ -107,11 +127,44 @@ Route::get('/send-welcome/{userId}', [MailController::class, 'sendWelcomeEmail']
 // Route chi tiết sản phẩm (slug để thân thiện URL)
 Route::get('/san-pham/{id}', [ProductController::class, 'show'])->name('product.show');
 
-// Danh mục
+
+Route::middleware('auth')->prefix('checkout')->name('checkout.')->group(function () {
+    Route::get('/', [CheckoutController::class, 'index'])->name('index');
+    Route::post('/process', [CheckoutController::class, 'process'])->name('process');
+    Route::get('/success/{orderId}', [CheckoutController::class, 'success'])->name('success');
+});
+
+/*
+|--------------------------------------------------------------------------
+| MAIL
+|--------------------------------------------------------------------------
+*/
+Route::get('/test-email', [MailController::class, 'showTestForm'])
+    ->name('mail.test.form');
+
+Route::post('/test-email/send', [MailController::class, 'sendTestEmail'])
+    ->name('mail.test.send');
+
+Route::get('/send-welcome/{userId}', [MailController::class, 'sendWelcomeEmail'])
+    ->name('mail.welcome');
+
+/*
+|--------------------------------------------------------------------------
+| CHI TIẾT SẢN PHẨM
+|--------------------------------------------------------------------------
+*/
+Route::get('/san-pham/{id}', [ProductController::class, 'show'])
+    ->name('product.show');
+
+
 Route::get('/danh-muc/{id}', function ($id) {
-    $products = Product::where('brand', ucfirst(str_replace('-', ' ', $id)))->paginate(12);
+    $products = Product::where('brand', ucfirst(str_replace('-', ' ', $id)))
+        ->paginate(12);
+
     return view('shop.category', compact('products', 'id'));
 })->name('shop.category');
 
 // Thêm giỏ hàng
 Route::post('cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+
+

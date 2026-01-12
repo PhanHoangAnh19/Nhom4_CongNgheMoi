@@ -91,9 +91,9 @@ class CheckoutController extends Controller
                 $totalAmount += $item['price'] * $item['quantity'];
             }
 
-            // Tạo đơn hàng
+            // Tạo đơn hàng - user_id có thể null nếu chưa đăng nhập
             $order = Order::create([
-                'user_id' => Auth::id(),
+                'user_id' => Auth::check() ? Auth::id() : null,
                 'order_number' => Order::generateOrderNumber(),
                 'total_amount' => $totalAmount,
                 'status' => 'pending',
@@ -133,6 +133,9 @@ class CheckoutController extends Controller
             // Xóa giỏ hàng
             session()->forget('cart');
 
+            // Lưu order_id vào session để kiểm tra quyền truy cập
+            session()->put('last_order_id', $order->id);
+
             return redirect()->route('checkout.success', $order->id)
                            ->with('success', 'Đặt hàng thành công!');
 
@@ -144,14 +147,30 @@ class CheckoutController extends Controller
         }
     }
 
-    // Trang đặt hàng thành công - Sử dụng Route Model Binding
-    public function success(Order $order)
+    // Trang đặt hàng thành công
+    public function success($orderId)
     {
-        // Load relationship
-        $order->load('orderItems');
+        // Tìm order
+        $order = Order::with('orderItems')->find($orderId);
         
-        // Kiểm tra xem đơn hàng có thuộc về user hiện tại không
-        if (Auth::check() && $order->user_id !== Auth::id()) {
+        if (!$order) {
+            abort(404, 'Đơn hàng không tồn tại');
+        }
+        
+        // Kiểm tra quyền truy cập
+        $canAccess = false;
+        
+        // Trường hợp 1: Đã đăng nhập và là đơn của mình
+        if (Auth::check() && $order->user_id == Auth::id()) {
+            $canAccess = true;
+        }
+        
+        // Trường hợp 2: Vừa mới đặt hàng (có trong session)
+        if (session()->get('last_order_id') == $order->id) {
+            $canAccess = true;
+        }
+        
+        if (!$canAccess) {
             abort(403, 'Bạn không có quyền xem đơn hàng này');
         }
         
