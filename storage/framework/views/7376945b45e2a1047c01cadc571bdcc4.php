@@ -1,6 +1,4 @@
-@extends('layouts.client')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <style>
     :root {
         --primary-color: #D10024;
@@ -111,85 +109,86 @@
 <div class="section">
     <div class="container">
         <div class="row">
-            @php
+            <?php
                 $banners = [
                     ['title' => 'Laptop', 'img' => 'shop01.png'],
                     ['title' => 'Phụ kiện', 'img' => 'shop03.png'],
                     ['title' => 'Camera', 'img' => 'shop02.png']
                 ];
-            @endphp
-            @foreach($banners as $bn)
+            ?>
+            <?php $__currentLoopData = $banners; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $bn): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <div class="col-md-4 col-xs-6">
                 <div class="shop shop-banner">
                     <div class="shop-img">
-                        <img src="{{ asset('img/' . $bn['img']) }}" alt="">
+                        <img src="<?php echo e(asset('img/' . $bn['img'])); ?>" alt="">
                     </div>
                     <div class="shop-body">
-                        <h3>{{ $bn['title'] }}<br>Collection</h3>
+                        <h3><?php echo e($bn['title']); ?><br>Collection</h3>
                         <a href="#" class="cta-btn">Mua ngay <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
             </div>
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </div>
     </div>
 </div>
 
 <div class="section" style="background: #fbfbfc; padding: 60px 0;">
     <div class="container">
-        @foreach($categories as $categoryName => $productList)
-            @if($productList->count() > 0)
+        <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $categoryName => $productList): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <?php if($productList->count() > 0): ?>
                 <div class="mb-50">
                     <div class="category-title-box">
-                        <h3 class="title">{{ $categoryName }}</h3>
+                        <h3 class="title"><?php echo e($categoryName); ?></h3>
                         <a href="#" class="text-danger fw-bold">Xem tất cả <i class="fa fa-angle-right"></i></a>
                     </div>
 
                     <div class="row">
-                        @foreach($productList as $item)
+                        <?php $__currentLoopData = $productList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div class="col-md-3 col-sm-6 col-xs-6 mb-30">
                             <div class="product-item">
                                 <div class="product-label">
-                                    <span class="label-new">{{ $item->quantity > 0 ? 'MỚI' : 'HẾT HÀNG' }}</span>
+                                    <span class="label-new"><?php echo e($item->quantity > 0 ? 'MỚI' : 'HẾT HÀNG'); ?></span>
                                 </div>
                                 
                                 <div class="product-img-box">
-                                    {{-- Đảm bảo đường dẫn asset($item->image) là chính xác --}}
-                                    <img src="{{ asset($item->image) }}" alt="{{ $item->name }}" onerror="this.src='{{ asset('img/no-image.png') }}'">
+                                    
+                                    <img src="<?php echo e(asset($item->image)); ?>" alt="<?php echo e($item->name); ?>" onerror="this.src='<?php echo e(asset('img/no-image.png')); ?>'">
                                 </div>
 
                                 <div class="product-body text-center" style="flex: 1;">
-                                    <p class="text-muted small mb-1">{{ $item->brand }}</p>
+                                    <p class="text-muted small mb-1"><?php echo e($item->brand); ?></p>
                                     <h3 class="h6 fw-bold mb-2">
-                                        <a href="#" class="text-dark text-decoration-none">{{ Str::limit($item->name, 35) }}</a>
+                                        <a href="#" class="text-dark text-decoration-none"><?php echo e(Str::limit($item->name, 35)); ?></a>
                                     </h3>
                                     <h4 class="text-danger fw-extrabold mb-3">
-                                        {{ number_format($item->price, 0, ',', '.') }}₫
+                                        <?php echo e(number_format($item->price, 0, ',', '.')); ?>₫
                                     </h4>
                                     
                                     <div class="mb-3">
-                                        @if($item->quantity > 0)
-                                            <small class="text-success"><i class="fa fa-check"></i> Sẵn hàng ({{ $item->quantity }})</small>
-                                        @else
+                                        <?php if($item->quantity > 0): ?>
+                                            <small class="text-success"><i class="fa fa-check"></i> Sẵn hàng (<?php echo e($item->quantity); ?>)</small>
+                                        <?php else: ?>
                                             <small class="text-secondary"><i class="fa fa-clock-o"></i> Chờ hàng</small>
-                                        @endif
+                                        <?php endif; ?>
                                     </div>
                                 </div>
 
-                                <form action="{{ route('cart.add', $item->id) }}" method="POST">
-                                    @csrf
+                                <form action="<?php echo e(route('cart.add', $item->id)); ?>" method="POST">
+                                    <?php echo csrf_field(); ?>
                                     <input type="hidden" name="quantity" value="1">
-                                    <button type="submit" class="btn-add-to-cart {{ $item->quantity <= 0 ? 'disabled' : '' }}" {{ $item->quantity <= 0 ? 'disabled' : '' }}>
+                                    <button type="submit" class="btn-add-to-cart <?php echo e($item->quantity <= 0 ? 'disabled' : ''); ?>" <?php echo e($item->quantity <= 0 ? 'disabled' : ''); ?>>
                                         <i class="fa fa-shopping-cart"></i> THÊM GIỎ HÀNG
                                     </button>
                                 </form>
                             </div>
                         </div>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
-            @endif
-        @endforeach
+            <?php endif; ?>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.client', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\12-1\Nhom4_CongNgheMoi\resources\views/client/index.blade.php ENDPATH**/ ?>

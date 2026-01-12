@@ -4,27 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // Thêm dòng này để dùng DB::raw
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File; // Thêm dòng này để xử lý xóa file ảnh
 
 class ProductController extends Controller
 {
-    /**
-     * TRANG NGƯỜI DÙNG: Hiển thị sản phẩm cho khách hàng (Shop)
-     */
-    public function userIndex()
-    {
-        $products = Product::all();
-
-        // Đồng bộ dữ liệu dựa trên cột 'brand'
-        $categories = [
-            'iPhone' => $products->filter(fn($p) => $p->brand == 'iPhone'),
-            'Samsung' => $products->filter(fn($p) => $p->brand == 'Samsung'),
-            'Dòng máy khác' => $products->filter(fn($p) => !in_array($p->brand, ['iPhone', 'Samsung'])),
-        ];
-
-        return view('user_shop', compact('categories'));
-    }
-
     /**
      * TRANG ADMIN: Danh sách quản lý
      */
@@ -84,11 +68,18 @@ class ProductController extends Controller
             'brand' => 'required',
             'price' => 'required|numeric',
             'quantity' => 'required|integer',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $data = $request->all();
 
         if ($request->hasFile('image')) {
+            // 1. Xóa ảnh cũ nếu có để tránh rác server
+            if ($product->image && File::exists(public_path($product->image))) {
+                File::delete(public_path($product->image));
+            }
+
+            // 2. Lưu ảnh mới
             $fileName = time() . '.' . $request->image->extension();
             $request->image->move(public_path('uploads/products'), $fileName);
             $data['image'] = 'uploads/products/' . $fileName;
@@ -96,39 +87,44 @@ class ProductController extends Controller
 
         $product->update($data);
 
-        return redirect()->route('products.index')->with('success', 'Đã cập nhật thông tin máy!');
+        // SỬA LỖI: redirect về admin.products.index
+        return redirect()->route('admin.products.index')->with('success', 'Đã cập nhật thông tin máy!');
     }
 
     public function destroy(Product $product)
     {
+        // Xóa file ảnh vật lý trước khi xóa dữ liệu trong DB
+        if ($product->image && File::exists(public_path($product->image))) {
+            File::delete(public_path($product->image));
+        }
+
         $product->delete();
-        return redirect()->route('products.index')->with('success', 'Đã xóa sản phẩm!');
+
+        // SỬA LỖI: redirect về admin.products.index
+        return redirect()->route('admin.products.index')->with('success', 'Đã xóa sản phẩm!');
     }
 
     /**
-     * TRANG THỐNG KÊ: Lấy dữ liệu thực cho biểu đồ
+     * TRANG THỐNG KÊ
      */
     public function thongKe() 
-{
-    // 1. Thống kê số lượng máy theo hãng
-    $dataQuantity = Product::select('brand', \DB::raw('count(*) as total'))
-                    ->groupBy('brand')
-                    ->get();
+    {
+        $dataQuantity = Product::select('brand', DB::raw('count(*) as total'))
+                        ->groupBy('brand')
+                        ->get();
 
-    // 2. Thống kê doanh thu dự kiến theo từng hãng
-    $dataRevenue = Product::select('brand', \DB::raw('SUM(price * quantity) as total_revenue'))
-                    ->groupBy('brand')
-                    ->get();
+        $dataRevenue = Product::select('brand', DB::raw('SUM(price * quantity) as total_revenue'))
+                        ->groupBy('brand')
+                        ->get();
 
-    // 3. TÍNH TỔNG TẤT CẢ DOANH THU (Số tiền nhận lại khi bán hết sạch hàng)
-    $totalAllRevenue = Product::sum(\DB::raw('price * quantity'));
+        $totalAllRevenue = Product::sum(DB::raw('price * quantity'));
 
-    return view('products.thongke', [
-        'labels' => $dataQuantity->pluck('brand')->toArray(),
-        'values' => $dataQuantity->pluck('total')->toArray(),
-        'revLabels' => $dataRevenue->pluck('brand')->toArray(),
-        'revValues' => $dataRevenue->pluck('total_revenue')->toArray(),
-        'totalAllRevenue' => $totalAllRevenue, // Gửi biến này sang View
-    ]);
-}
+        return view('products.thongke', [
+            'labels' => $dataQuantity->pluck('brand')->toArray(),
+            'values' => $dataQuantity->pluck('total')->toArray(),
+            'revLabels' => $dataRevenue->pluck('brand')->toArray(),
+            'revValues' => $dataRevenue->pluck('total_revenue')->toArray(),
+            'totalAllRevenue' => $totalAllRevenue,
+        ]);
+    }
 }
