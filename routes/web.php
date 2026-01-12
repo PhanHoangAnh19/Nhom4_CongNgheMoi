@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\MailController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+
 /*
 |--------------------------------------------------------------------------
 | ROOT
@@ -27,7 +28,7 @@ Route::get('/', function () {
 */
 Route::middleware('guest')->group(function () {
 
-    Route::get('/landing', fn() => view('auth.landing'))->name('landing');
+    Route::get('/landing', fn () => view('auth.landing'))->name('landing');
 
     // Login
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -54,7 +55,7 @@ Route::post('/logout', [LoginController::class, 'logout'])
 
 /*
 |--------------------------------------------------------------------------
-| HOME + PRODUCTS (KHÔNG PHÂN QUYỀN ADMIN)
+| HOME + PRODUCTS (AUTH)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
@@ -98,7 +99,7 @@ Route::middleware('auth')->prefix('cart')->name('cart.')->group(function () {
 Route::middleware('auth')->prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/process', [CheckoutController::class, 'process'])->name('process');
-    Route::get('/success/{id}', [CheckoutController::class, 'success'])->name('success');
+    Route::get('/success/{orderId}', [CheckoutController::class, 'success'])->name('success');
 });
 
 /*
@@ -114,20 +115,18 @@ Route::post('/test-email/send', [MailController::class, 'sendTestEmail'])
 
 Route::get('/send-welcome/{userId}', [MailController::class, 'sendWelcomeEmail'])
     ->name('mail.welcome');
+
 /*
 |--------------------------------------------------------------------------
 | CHI TIẾT SẢN PHẨM
 |--------------------------------------------------------------------------
 */
-// Giả sử bạn có controller này
-
-// Route chi tiết sản phẩm (slug để thân thiện URL)
-Route::get('/san-pham/{id}', [ProductController::class, 'show'])->name('product.show');
-
-// Route::get('/danh-muc/{slug}', [App\Http\Controllers\ShopController::class, 'category'])
-//    ->name('shop.category');
+Route::get('/san-pham/{id}', [ProductController::class, 'show'])
+    ->name('product.show');
 
 Route::get('/danh-muc/{id}', function ($id) {
-    $products = Product::where('brand', ucfirst(str_replace('-', ' ', $id)))->paginate(12);
+    $products = Product::where('brand', ucfirst(str_replace('-', ' ', $id)))
+        ->paginate(12);
+
     return view('shop.category', compact('products', 'id'));
 })->name('shop.category');
