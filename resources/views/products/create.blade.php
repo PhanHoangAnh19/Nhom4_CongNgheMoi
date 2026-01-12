@@ -9,7 +9,7 @@
                     <h5 class="mb-0 fw-bold text-primary"><i class="fas fa-plus-circle me-2"></i>Thêm sản phẩm mới</h5>
                 </div>
                 <div class="card-body p-4">
-                    <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         
                         <div class="row">
@@ -67,7 +67,7 @@
 
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save me-2"></i>Lưu máy mới</button>
-                            <a href="{{ route('products.index') }}" class="btn btn-light px-4 border">Hủy bỏ</a>
+                            <a href="{{ route('admin.products.index') }}" class="btn btn-light px-4 border">Hủy bỏ</a>
                         </div>
                     </form>
                 </div>

@@ -2,11 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Models\Product;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\UserRegisterController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\MailController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,13 +16,9 @@ use App\Http\Controllers\Auth\UserRegisterController;
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    if (!auth()->check()) {
-        return redirect()->route('landing');
-    }
-
-    return auth()->user()->role === 'admin'
+    return auth()->check()
         ? redirect()->route('home')
-        : redirect()->route('shop.index');
+        : redirect()->route('landing');
 });
 
 /*
@@ -32,12 +30,15 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/landing', fn() => view('auth.landing'))->name('landing');
 
+    // Login
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
 
+    // Register
     Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
 
+    // OTP
     Route::get('/verify-otp', [RegisterController::class, 'showVerifyOtpForm'])->name('otp.view');
     Route::post('/verify-otp', [RegisterController::class, 'verifyOtp'])->name('otp.verify');
     Route::post('/resend-otp', [RegisterController::class, 'resendOtp'])->name('otp.resend');
@@ -54,13 +55,16 @@ Route::post('/logout', [LoginController::class, 'logout'])
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN
+| HOME + PRODUCTS (KHÔNG PHÂN QUYỀN ADMIN)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
+
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+
     Route::resource('products', ProductController::class);
 });
+
 /*
 |--------------------------------------------------------------------------
 | SHOP
@@ -76,23 +80,38 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| REGISTER USER (RIÊNG)
+| CART
 |--------------------------------------------------------------------------
 */
-Route::middleware('guest')->group(function () {
-
-    Route::get('/register-user', [UserRegisterController::class, 'showForm'])
-        ->name('user.register');
-
-    Route::post('/register-user', [UserRegisterController::class, 'register'])
-        ->name('user.register.submit');
-
-    Route::get('/verify-user-otp', [UserRegisterController::class, 'showVerifyOtpForm'])
-        ->name('user.otp.view');
-
-    Route::post('/verify-user-otp', [UserRegisterController::class, 'verifyOtp'])
-        ->name('user.otp.verify');
-
-    Route::post('/resend-user-otp', [UserRegisterController::class, 'resendOtp'])
-        ->name('user.otp.resend');
+Route::middleware('auth')->prefix('cart')->name('cart.')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
+    Route::post('/update', [CartController::class, 'update'])->name('update');
+    Route::delete('/remove/{product}', [CartController::class, 'remove'])->name('remove');
+    Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
 });
+
+/*
+|--------------------------------------------------------------------------
+| CHECKOUT
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->prefix('checkout')->name('checkout.')->group(function () {
+    Route::get('/', [CheckoutController::class, 'index'])->name('index');
+    Route::post('/process', [CheckoutController::class, 'process'])->name('process');
+    Route::get('/success/{id}', [CheckoutController::class, 'success'])->name('success');
+});
+
+/*
+|--------------------------------------------------------------------------
+| MAIL
+|--------------------------------------------------------------------------
+*/
+Route::get('/test-email', [MailController::class, 'showTestForm'])
+    ->name('mail.test.form');
+
+Route::post('/test-email/send', [MailController::class, 'sendTestEmail'])
+    ->name('mail.test.send');
+
+Route::get('/send-welcome/{userId}', [MailController::class, 'sendWelcomeEmail'])
+    ->name('mail.welcome');

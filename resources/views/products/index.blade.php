@@ -57,7 +57,7 @@
     <div class="card shadow border-0">
         <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
             <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-list-ul me-2"></i>Quản lý sản phẩm - Nhóm 4</h5>
-            <a href="{{ route('products.create') }}" class="btn btn-primary shadow-sm px-3">
+            <a href="{{ route('admin.products.create') }}" class="btn btn-primary shadow-sm px-3">
                 <i class="fas fa-plus-circle me-1"></i> Thêm máy mới
             </a>
         </div>
@@ -119,10 +119,10 @@
                             </td>
                             <td class="text-center pe-4">
                                 <div class="d-flex justify-content-center gap-2">
-                                    <a href="{{ route('products.edit', $product->id) }}" class="btn btn-warning btn-sm text-white px-3 shadow-sm">
+                                    <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-warning btn-sm text-white px-3 shadow-sm">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa máy này?')">
+                                    <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa máy này?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger btn-sm px-3 shadow-sm">

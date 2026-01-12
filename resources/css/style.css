@@ -1,0 +1,256 @@
+/* ================================================
+   Giỏ hàng & Thanh toán CSS
+   ================================================ */
+
+/* Breadcrumb */
+#breadcrumb {
+    background: #f9f9f9;
+    padding: 20px 0;
+    margin-bottom: 30px;
+}
+
+.breadcrumb-tree {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.breadcrumb-tree li {
+    display: inline-block;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.breadcrumb-tree li + li:before {
+    content: "/";
+    padding: 0 10px;
+    color: #999;
+}
+
+.breadcrumb-tree li a {
+    color: #2B2D42;
+}
+
+.breadcrumb-tree li a:hover {
+    color: #D10024;
+}
+
+.breadcrumb-tree li.active {
+    color: #D10024;
+}
+
+/* Order Summary */
+.order-summary {
+    border: 2px solid #E4E7ED;
+    padding: 30px;
+}
+
+.order-col {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #E4E7ED;
+}
+
+.order-col:last-child {
+    border-bottom: none;
+}
+
+.order-products {
+    margin: 20px 0;
+}
+
+.order-total {
+    color: #D10024;
+    font-size: 28px;
+}
+
+/* Billing Details */
+.billing-details {
+    margin-bottom: 30px;
+}
+
+.billing-details .input,
+.billing-details select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #E4E7ED;
+    background: #FFF;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #2B2D42;
+}
+
+.billing-details .input:focus,
+.billing-details select:focus {
+    border-color: #D10024;
+    outline: none;
+}
+
+.billing-details textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Section Title */
+.section-title {
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.section-title .title {
+    font-size: 24px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #2B2D42;
+    margin: 0;
+}
+
+.section-title .title:after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: #D10024;
+    margin-top: 10px;
+}
+
+/* Order Details */
+.order-details {
+    position: sticky;
+    top: 20px;
+}
+
+/* Primary Button */
+.primary-btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background: #D10024;
+    color: #FFF;
+    text-transform: uppercase;
+    font-weight: 700;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s all;
+}
+
+.primary-btn:hover {
+    background: #b8001f;
+    color: #FFF;
+}
+
+.order-submit {
+    margin-top: 20px;
+}
+
+/* Product Widget in Cart */
+.product-widget {
+    padding: 20px 0;
+    border-bottom: 1px solid #E4E7ED;
+}
+
+.product-widget:last-child {
+    border-bottom: none;
+}
+
+.product-widget .product-img {
+    width: 100px;
+    float: left;
+}
+
+.product-widget .product-img img {
+    width: 100%;
+    border-radius: 4px;
+}
+
+.product-widget .product-body {
+    padding-left: 120px;
+}
+
+.product-widget .product-name {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.product-widget .product-name a {
+    color: #2B2D42;
+    font-weight: 700;
+}
+
+.product-widget .product-name a:hover {
+    color: #D10024;
+}
+
+.product-widget .product-price {
+    font-size: 16px;
+    color: #D10024;
+    font-weight: 700;
+}
+
+.product-widget .delete {
+    font-size: 14px;
+    color: #D10024;
+}
+
+.product-widget .delete:hover {
+    color: #b8001f;
+}
+
+/* Alert Messages */
+.alert {
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.alert-success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.alert-dismissible .close {
+    float: right;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    opacity: 0.5;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.alert-dismissible .close:hover {
+    opacity: 0.75;
+}
+
+/* Responsive */
+@media only screen and (max-width: 991px) {
+    .order-details {
+        position: relative;
+        margin-top: 30px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .product-widget .product-img {
+        width: 80px;
+    }
+    
+    .product-widget .product-body {
+        padding-left: 100px;
+    }
+    
+    .section-title .title {
+        font-size: 20px;
+    }
+}
