@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Models\Product; // ← THÊM DÒNG NÀY
+use App\Models\Product;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -60,7 +60,7 @@ Route::post('/logout', [LoginController::class, 'logout'])
 */
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth']) // sau này có thể thêm 'admin'
+    ->middleware(['auth'])
     ->group(function () {
 
         // Dashboard
@@ -94,7 +94,7 @@ Route::middleware('auth')->group(function () {
 | CART
 |--------------------------------------------------------------------------
 */
-Route::get('/home-test', function () { // Đổi tên tạm để tránh trùng lặp
+Route::get('/home-test', function () {
     $categories = [
         'Laptop' => \App\Models\Product::where('brand', 'Dell')->take(4)->get(),
         'Điện thoại' => \App\Models\Product::where('brand', 'Apple')->take(4)->get(),
@@ -106,9 +106,9 @@ Route::get('/home-test', function () { // Đổi tên tạm để tránh trùng 
 // Giỏ hàng routes - Phải đặt trong middleware auth
 Route::middleware('auth')->prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
-    Route::post('/add/{product}', [CartController::class, 'add'])->name('add'); // ← ĐÚNG
+    Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
     Route::post('/update', [CartController::class, 'update'])->name('update');
-    Route::delete('/remove/{product}', [CartController::class, 'remove'])->name('remove'); // Sửa {id} thành {product}
+    Route::delete('/remove/{product}', [CartController::class, 'remove'])->name('remove');
     Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
 });
 
@@ -116,7 +116,8 @@ Route::middleware('auth')->prefix('cart')->name('cart.')->group(function () {
 Route::middleware('auth')->prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/process', [CheckoutController::class, 'process'])->name('process');
-    Route::get('/success/{id}', [CheckoutController::class, 'success'])->name('success');
+    // THAY ĐỔI TỪ {id} THÀNH {orderId} ĐỂ KHỚP VỚI CONTROLLER
+    Route::get('/success/{orderId}', [CheckoutController::class, 'success'])->name('success');
 });
 
 /*
