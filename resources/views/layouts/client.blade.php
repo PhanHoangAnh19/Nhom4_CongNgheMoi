@@ -585,7 +585,9 @@
                             <p id="modalProductDescription" class="text-muted mt-3"></p>
 
                             <div class="mt-4">
-                                <button id="modalAddToCart" class="btn btn-primary btn-block mb-2">Thêm vào giỏ</button>
+                                <button id="modalAddToCart" class="btn btn-primary btn-block mb-2" data-product-id="">
+                                    <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
+                                </button>
                                 <button class="btn btn-success btn-block">Mua ngay</button>
                             </div>
                         </div>
@@ -595,33 +597,50 @@
         </div>
     </div>
 
-    <!-- JavaScript để điền dữ liệu vào modal -->
+    <!-- JavaScript để điền dữ liệu và xử lý thêm giỏ hàng -->
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const productModal = document.getElementById('productModal');
+document.addEventListener('DOMContentLoaded', function () {
+    const productModal = document.getElementById('productModal');
+    const modalAddForm = document.getElementById('modalAddForm');
+    let currentProductId = null;
 
-        productModal.addEventListener('show.bs.modal', function (event) {
-            const trigger = event.relatedTarget;
+    // Khi modal mở
+    productModal.addEventListener('show.bs.modal', function (event) {
+        const trigger = event.relatedTarget;
+        if (!trigger) return;
 
-            if (!trigger) return;
+        // Điền dữ liệu
+        document.getElementById('modalProductName').textContent = trigger.getAttribute('data-name') || 'Không có tên';
+        document.getElementById('modalProductBrand').textContent = trigger.getAttribute('data-brand') || 'N/A';
+        document.getElementById('modalProductPrice').textContent = trigger.getAttribute('data-price') || 'N/A';
+        document.getElementById('modalProductStock').textContent = trigger.getAttribute('data-stock') || 'N/A';
+        document.getElementById('modalProductImage').src = trigger.getAttribute('data-image') || '{{ asset('img/no-image.png') }}';
+        document.getElementById('modalProductDescription').textContent = trigger.getAttribute('data-description') || 'Chưa có mô tả chi tiết';
 
-            const name = trigger.getAttribute('data-name') || 'Không có tên';
-            const brand = trigger.getAttribute('data-brand') || 'N/A';
-            const price = trigger.getAttribute('data-price') || 'N/A';
-            const stock = trigger.getAttribute('data-stock') || 'N/A';
-            const image = trigger.getAttribute('data-image') || '{{ asset('img/no-image.png') }}';
-            const description = trigger.getAttribute('data-description') || 'Chưa có mô tả chi tiết';
+        // Lấy ID sản phẩm
+        currentProductId = trigger.getAttribute('data-id');
 
-            document.getElementById('modalProductName').textContent = name;
-            document.getElementById('modalProductBrand').textContent = brand;
-            document.getElementById('modalProductPrice').textContent = price;
-            document.getElementById('modalProductStock').textContent = stock;
-            document.getElementById('modalProductImage').src = image;
-            document.getElementById('modalProductDescription').textContent = description;
-        });
+        // Cập nhật action form đúng (dùng placeholder :id)
+        if (currentProductId && modalAddForm) {
+            const baseUrl = "{{ route('cart.add', ['product' => ':id']) }}";
+            modalAddForm.action = baseUrl.replace(':id', currentProductId);
+        } else {
+            console.error('Không tìm thấy ID sản phẩm!');
+        }
     });
-    </script>
 
+    // Submit form bình thường (Laravel sẽ redirect)
+    if (modalAddForm) {
+        modalAddForm.addEventListener('submit', function (e) {
+            if (!currentProductId) {
+                e.preventDefault();
+                alert('Không tìm thấy ID sản phẩm!');
+            }
+            // Không cần preventDefault vì muốn submit POST thật
+        });
+    }
+});
+</script>
     @stack('scripts')
 </body>
 </html>

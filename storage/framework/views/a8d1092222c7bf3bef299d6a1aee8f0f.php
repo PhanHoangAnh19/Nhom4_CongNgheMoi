@@ -1,3 +1,18 @@
+<?php if(session('success')): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <?php echo e(session('success')); ?>
+
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
+<?php if(session('error')): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <?php echo e(session('error')); ?>
+
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
 <?php $__env->startSection('content'); ?>
 <style>
     :root {
@@ -5,7 +20,7 @@
         --bg-light: #fbfbfc;
         --card-shadow: 0 10px 25px rgba(0,0,0,0.06);
     }
-
+ 
     /* Tối ưu Banner */
     .shop-banner {
         border-radius: 15px;
@@ -14,7 +29,7 @@
         transition: 0.3s;
     }
     .shop-banner:hover { transform: translateY(-5px); }
-
+ 
     /* Card sản phẩm chuyên nghiệp */
     .product-item {
         background: #fff;
@@ -32,7 +47,7 @@
         border-color: transparent;
         transform: translateY(-8px);
     }
-
+ 
     /* Khung ảnh cố định để không bị lệch hàng */
     .product-img-box {
         height: 200px;
@@ -47,7 +62,7 @@
         max-width: 100%;
         object-fit: contain; /* Giữ nguyên tỉ lệ ảnh */
     }
-
+ 
     /* Nhãn MỚI/HẾT HÀNG */
     .product-label {
         position: absolute;
@@ -63,7 +78,7 @@
         font-weight: 700;
         border-radius: 50px;
     }
-
+ 
     /* Header danh mục */
     .category-title-box {
         display: flex;
@@ -88,7 +103,7 @@
         height: 2px;
         background: var(--primary-color);
     }
-
+ 
     /* Nút thêm giỏ hàng */
     .btn-add-to-cart {
         background: #15161D;
@@ -105,7 +120,7 @@
         background: var(--primary-color);
     }
 </style>
-
+ 
 <div class="section">
     <div class="container">
         <div class="row">
@@ -132,7 +147,7 @@
         </div>
     </div>
 </div>
-
+ 
 <div class="section" style="background: #fbfbfc; padding: 60px 0;">
     <div class="container">
         <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $categoryName => $productList): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -152,7 +167,7 @@
                                 <div class="product-label">
                                     <span class="label-new"><?php echo e($item->quantity > 0 ? 'MỚI' : 'HẾT HÀNG'); ?></span>
                                 </div>
-                                
+                               
                                 <!-- Ảnh sản phẩm - CLICK MỞ MODAL -->
                                 <div class="product-img-box" style="cursor: pointer;"
                                     data-bs-toggle="modal" data-bs-target="#productModal"
@@ -164,10 +179,10 @@
                                     data-description="<?php echo e($item->description ?? 'Chưa có mô tả chi tiết'); ?>">
                                     <img src="<?php echo e(asset($item->image)); ?>" alt="<?php echo e($item->name); ?>" onerror="this.src='<?php echo e(asset('img/no-image.png')); ?>'">
                                 </div>
-
+ 
                                 <div class="product-body text-center" style="flex: 1;">
                                     <p class="text-muted small mb-1"><?php echo e($item->brand); ?></p>
-                                    
+                                   
                                     <!-- Tên sản phẩm - CLICK MỞ MODAL -->
                                     <h3 class="h6 fw-bold mb-2" style="cursor: pointer;"
                                         data-bs-toggle="modal" data-bs-target="#productModal"
@@ -180,11 +195,11 @@
                                         <?php echo e(Str::limit($item->name, 35)); ?>
 
                                     </h3>
-                                    
+                                   
                                     <h4 class="text-danger fw-extrabold mb-3">
                                         <?php echo e(number_format($item->price, 0, ',', '.')); ?>₫
                                     </h4>
-                                    
+                                   
                                     <div class="mb-3">
                                         <?php if($item->quantity > 0): ?>
                                             <small class="text-success"><i class="fa fa-check"></i> Sẵn hàng (<?php echo e($item->quantity); ?>)</small>
@@ -193,7 +208,7 @@
                                         <?php endif; ?>
                                     </div>
                                 </div>
-
+ 
                                 <form action="<?php echo e(route('cart.add', $item->id)); ?>" method="POST">
                                     <?php echo csrf_field(); ?>
                                     <input type="hidden" name="quantity" value="1">
