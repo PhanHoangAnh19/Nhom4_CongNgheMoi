@@ -74,17 +74,17 @@
 
             <ul class="list-unstyled components">
                 <div class="sidebar-heading">Bảng điều khiển</div>
-                <li class="{{ Request::is('products') ? 'active' : '' }}">
-                    <a href="{{ route('products.index') }}"><i class="fas fa-home"></i> Dashboard</a>
+                <li class="{{ Request::is('admin/home') ? 'active' : '' }}">
+                    <a href="{{ route('admin.home') }}"><i class="fas fa-home"></i> Dashboard</a>
                 </li>
 
                 <div class="sidebar-heading">Cửa hàng</div>
-                <li class="{{ Request::is('products*') && !Request::is('products') && !Request::is('products/thong-ke') ? 'active' : '' }}">
-                    <a href="{{ route('products.index') }}"><i class="fas fa-mobile-alt"></i> Quản lý điện thoại</a>
+                <li class="{{ Request::is('admin/products') ? 'active' : '' }}">
+                    <a href="{{ route('admin.products.index') }}"><i class="fas fa-mobile-alt"></i> Quản lý điện thoại</a>
                 </li>
 
-                <li class="{{ Request::is('products/thong-ke') ? 'active' : '' }}">
-                    <a href="/products/thong-ke">
+                <li class="{{ Request::is('admin/products/thong-ke') ? 'active' : '' }}">
+                    <a href="{{ route('admin.products.thongke') }}">
                         <i class="fas fa-chart-pie"></i> Biểu đồ thống kê
                     </a>
                 </li>
@@ -93,7 +93,7 @@
                 
                 <div class="sidebar-heading">Giao diện khách</div>
                 <li>
-                    <a href="/shop" class="text-warning fw-bold">
+                    <a href="{{ route('shop.index') }}" class="text-warning fw-bold">
                         <i class="fas fa-shopping-bag"></i> Xem trang Shop
                     </a>
                 </li>
@@ -123,7 +123,7 @@
                                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                             <i class="fas fa-sign-out-alt me-2 text-danger"></i> Đăng xuất
                                         </a>
-                                        <form id="logout-form" action="{{ url('/logout') }}" method="POST" class="d-none">
+                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                             @csrf
                                         </form>
                                     </div>

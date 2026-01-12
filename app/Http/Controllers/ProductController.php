@@ -66,7 +66,7 @@ class ProductController extends Controller
 
         Product::create($data);
         
-        return redirect()->route('products.index')->with('success', 'Đã thêm điện thoại mới thành công!');
+        return redirect()->route('admin.products.index')->with('success', 'Đã thêm điện thoại mới thành công!');
     }
 
     public function edit(Product $product)
