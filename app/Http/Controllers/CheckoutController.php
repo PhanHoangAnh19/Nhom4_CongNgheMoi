@@ -15,11 +15,11 @@ class CheckoutController extends Controller
     public function index()
     {
         $cart = session()->get('cart', []);
-        
+
         if (empty($cart)) {
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng trống!');
         }
-        
+
         // Kiểm tra số lượng tồn kho trước khi thanh toán
         foreach ($cart as $id => $item) {
             $product = Product::find($id);
@@ -29,20 +29,22 @@ class CheckoutController extends Controller
                 session()->put('cart', $cart);
                 continue;
             }
-            
+
             if ($product->quantity < $item['quantity']) {
-                return redirect()->route('cart.index')->with('error', 
-                    'Sản phẩm "' . $item['name'] . '" chỉ còn ' . $product->quantity . ' trong kho. Vui lòng cập nhật số lượng!');
+                return redirect()->route('cart.index')->with(
+                    'error',
+                    'Sản phẩm "' . $item['name'] . '" chỉ còn ' . $product->quantity . ' trong kho. Vui lòng cập nhật số lượng!'
+                );
             }
         }
-        
+
         $total = 0;
         foreach ($cart as $item) {
             $total += $item['price'] * $item['quantity'];
         }
-        
+
         $user = Auth::user();
-        
+
         return view('checkout.index', compact('cart', 'total', 'user'));
     }
 
@@ -67,27 +69,27 @@ class CheckoutController extends Controller
         ]);
 
         $cart = session()->get('cart', []);
-        
+
         if (empty($cart)) {
             return redirect()->route('cart.index')->with('error', 'Giỏ hàng trống!');
         }
 
         DB::beginTransaction();
-        
+
         try {
             // Kiểm tra lại số lượng tồn kho và tính tổng tiền
             $totalAmount = 0;
             foreach ($cart as $id => $item) {
                 $product = Product::lockForUpdate()->find($id);
-                
+
                 if (!$product) {
                     throw new \Exception('Sản phẩm "' . $item['name'] . '" không tồn tại!');
                 }
-                
+
                 if ($product->quantity < $item['quantity']) {
                     throw new \Exception('Sản phẩm "' . $item['name'] . '" chỉ còn ' . $product->quantity . ' trong kho!');
                 }
-                
+
                 $totalAmount += $item['price'] * $item['quantity'];
             }
 
@@ -112,7 +114,7 @@ class CheckoutController extends Controller
             // Tạo order items và cập nhật số lượng sản phẩm
             foreach ($cart as $id => $item) {
                 $product = Product::find($id);
-                
+
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
@@ -137,13 +139,13 @@ class CheckoutController extends Controller
             session()->put('last_order_id', $order->id);
 
             return redirect()->route('checkout.success', $order->id)
-                           ->with('success', 'Đặt hàng thành công!');
+                ->with('success', 'Đặt hàng thành công!');
 
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()
-                           ->withInput()
-                           ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
+                ->withInput()
+                ->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
 
@@ -152,28 +154,52 @@ class CheckoutController extends Controller
     {
         // Tìm order
         $order = Order::with('orderItems')->find($orderId);
-        
+
         if (!$order) {
             abort(404, 'Đơn hàng không tồn tại');
         }
-        
+
         // Kiểm tra quyền truy cập
         $canAccess = false;
-        
+
         // Trường hợp 1: Đã đăng nhập và là đơn của mình
         if (Auth::check() && $order->user_id == Auth::id()) {
             $canAccess = true;
         }
-        
+
         // Trường hợp 2: Vừa mới đặt hàng (có trong session)
         if (session()->get('last_order_id') == $order->id) {
             $canAccess = true;
         }
-        
+
         if (!$canAccess) {
             abort(403, 'Bạn không có quyền xem đơn hàng này');
         }
-        
+
         return view('checkout.success', compact('order'));
+    }
+
+    // Hàm dành cho Admin xem toàn bộ đơn hàng
+    public function adminOrders()
+    {
+        $orders = Order::orderBy('created_at', 'desc')->paginate(10);
+        return view('admin.orders.index', compact('orders'));
+    }
+
+    // Hàm hiển thị chi tiết đơn hàng
+    public function adminOrderDetail($id)
+    {
+        $order = Order::with('orderItems.product')->findOrFail($id);
+        return view('admin.orders.show', compact('order'));
+    }
+
+    public function history()
+    {
+        // Chỉ lấy đơn hàng của người đang đăng nhập
+        $orders = Order::where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('client.order_history', compact('orders'));
     }
 }

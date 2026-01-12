@@ -1,5 +1,17 @@
 @extends('layouts.client')
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
 
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
 @section('content')
 <style>
     :root {
@@ -7,7 +19,7 @@
         --bg-light: #fbfbfc;
         --card-shadow: 0 10px 25px rgba(0,0,0,0.06);
     }
-
+ 
     /* Tối ưu Banner */
     .shop-banner {
         border-radius: 15px;
@@ -16,7 +28,7 @@
         transition: 0.3s;
     }
     .shop-banner:hover { transform: translateY(-5px); }
-
+ 
     /* Card sản phẩm chuyên nghiệp */
     .product-item {
         background: #fff;
@@ -34,7 +46,7 @@
         border-color: transparent;
         transform: translateY(-8px);
     }
-
+ 
     /* Khung ảnh cố định để không bị lệch hàng */
     .product-img-box {
         height: 200px;
@@ -49,7 +61,7 @@
         max-width: 100%;
         object-fit: contain; /* Giữ nguyên tỉ lệ ảnh */
     }
-
+ 
     /* Nhãn MỚI/HẾT HÀNG */
     .product-label {
         position: absolute;
@@ -65,7 +77,7 @@
         font-weight: 700;
         border-radius: 50px;
     }
-
+ 
     /* Header danh mục */
     .category-title-box {
         display: flex;
@@ -90,7 +102,7 @@
         height: 2px;
         background: var(--primary-color);
     }
-
+ 
     /* Nút thêm giỏ hàng */
     .btn-add-to-cart {
         background: #15161D;
@@ -107,7 +119,7 @@
         background: var(--primary-color);
     }
 </style>
-
+ 
 <div class="section">
     <div class="container">
         <div class="row">
@@ -134,7 +146,7 @@
         </div>
     </div>
 </div>
-
+ 
 <div class="section" style="background: #fbfbfc; padding: 60px 0;">
     <div class="container">
         @foreach($categories as $categoryName => $productList)
@@ -154,7 +166,7 @@
                                 <div class="product-label">
                                     <span class="label-new">{{ $item->quantity > 0 ? 'MỚI' : 'HẾT HÀNG' }}</span>
                                 </div>
-                                
+                               
                                 <!-- Ảnh sản phẩm - CLICK MỞ MODAL -->
                                 <div class="product-img-box" style="cursor: pointer;"
                                     data-bs-toggle="modal" data-bs-target="#productModal"
@@ -166,10 +178,10 @@
                                     data-description="{{ $item->description ?? 'Chưa có mô tả chi tiết' }}">
                                     <img src="{{ asset($item->image) }}" alt="{{ $item->name }}" onerror="this.src='{{ asset('img/no-image.png') }}'">
                                 </div>
-
+ 
                                 <div class="product-body text-center" style="flex: 1;">
                                     <p class="text-muted small mb-1">{{ $item->brand }}</p>
-                                    
+                                   
                                     <!-- Tên sản phẩm - CLICK MỞ MODAL -->
                                     <h3 class="h6 fw-bold mb-2" style="cursor: pointer;"
                                         data-bs-toggle="modal" data-bs-target="#productModal"
@@ -181,11 +193,11 @@
                                         data-description="{{ $item->description ?? 'Chưa có mô tả chi tiết' }}">
                                         {{ Str::limit($item->name, 35) }}
                                     </h3>
-                                    
+                                   
                                     <h4 class="text-danger fw-extrabold mb-3">
                                         {{ number_format($item->price, 0, ',', '.') }}₫
                                     </h4>
-                                    
+                                   
                                     <div class="mb-3">
                                         @if($item->quantity > 0)
                                             <small class="text-success"><i class="fa fa-check"></i> Sẵn hàng ({{ $item->quantity }})</small>
@@ -194,7 +206,7 @@
                                         @endif
                                     </div>
                                 </div>
-
+ 
                                 <form action="{{ route('cart.add', $item->id) }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="quantity" value="1">
