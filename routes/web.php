@@ -13,11 +13,18 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 use Illuminate\Support\Facades\Mail;
 
 Route::get('/test-mail', function () {
-    Mail::raw('Đây là mail test từ Laravel', function ($message) {
+    Mail::raw('Hoa Don Cua Ban:
+                            MaHD:
+                            Ten Dien Thoai:
+                            Mau Sac:
+                            Gia:
+                            So Luong:
+                            PT Thanh Toán:', function ($message) {
         $message->to('kydoana51922@gmail.com')
-                ->subject('Test gửi mail Laravel');
+                ->subject('Thong bao hoa don');
     });
 
-    return 'Đã gửi mail (nếu không lỗi)';
+    return 'Sent!';
 });
+
 
