@@ -57,16 +57,10 @@ Route::post('/logout', [LoginController::class, 'logout'])
 | ADMIN
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'admin'])->group(function () {
-
+Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
-
-    Route::get('/products/thong-ke', [ProductController::class, 'thongKe'])
-        ->name('products.thongke');
-
     Route::resource('products', ProductController::class);
 });
-
 /*
 |--------------------------------------------------------------------------
 | SHOP
