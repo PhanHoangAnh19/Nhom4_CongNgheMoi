@@ -11,7 +11,7 @@
                 </ol>
             </nav>
             <h3 class="fw-bold mb-0 text-dark">
-                <i class="fas fa-file-invoice-dollar me-2 text-primary"></i>Đơn hàng #{{ $order->id }}
+                <i class="fas fa-file-invoice-dollar me-2 text-primary"></i>Đơn hàng #{{ $order->order_number }}
             </h3>
         </div>
         <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-secondary border-2 fw-bold">
@@ -37,12 +37,18 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($order->items as $item)
+                                @foreach($order->orderItems as $item)
                                 <tr>
                                     <td class="ps-4 py-3">
                                         <div class="d-flex align-items-center">
-                                            <div class="bg-light rounded-3 p-2 me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
-                                                <i class="fas fa-mobile-alt text-secondary"></i>
+                                            <div class="bg-light rounded-3 me-3 overflow-hidden" style="width: 55px; height: 55px; border: 1px solid #eee;">
+                                                @if($item->product_image)
+                                                    <img src="{{ asset('storage/' . $item->product_image) }}" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+                                                @else
+                                                    <div class="h-100 d-flex align-items-center justify-content-center">
+                                                        <i class="fas fa-mobile-alt text-secondary"></i>
+                                                    </div>
+                                                @endif
                                             </div>
                                             <div>
                                                 <div class="fw-bold text-dark mb-0">{{ $item->product_name }}</div>
@@ -84,38 +90,45 @@
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-header bg-white py-3 border-bottom">
-                    <h6 class="mb-0 fw-bold text-uppercase small tracking-wider text-muted">Thông tin giao hàng</h6>
+                    <h6 class="mb-0 fw-bold text-uppercase small tracking-wider text-muted">Thông tin khách hàng</h6>
                 </div>
                 <div class="card-body">
-                    <div class="mb-4">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="bg-primary-subtle text-primary rounded-circle p-2 me-3" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-user small"></i>
-                            </div>
-                            <div>
-                                <div class="text-muted small">Người nhận</div>
-                                <div class="fw-bold text-dark">{{ $order->customer_name }}</div>
-                            </div>
+                    <div class="mb-3 d-flex align-items-center">
+                        <div class="bg-primary-subtle text-primary rounded-circle p-2 me-3" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user small"></i>
                         </div>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-success-subtle text-success rounded-circle p-2 me-3" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-phone-alt small"></i>
-                            </div>
-                            <div>
-                                <div class="text-muted small">Điện thoại</div>
-                                <div class="fw-bold text-dark font-monospace">{{ $order->customer_phone }}</div>
-                            </div>
+                        <div>
+                            <div class="text-muted small">Người nhận</div>
+                            <div class="fw-bold text-dark">{{ $order->customer_name }}</div>
                         </div>
                     </div>
-                    <div class="alert alert-info border-0 shadow-none rounded-3 mb-0">
-                        <i class="fas fa-info-circle me-2"></i><small>Đơn hàng đặt lúc: {{ $order->created_at->format('d/m/Y H:i') }}</small>
+                    <div class="mb-3 d-flex align-items-center">
+                        <div class="bg-success-subtle text-success rounded-circle p-2 me-3" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-phone-alt small"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Điện thoại</div>
+                            <div class="fw-bold text-dark font-monospace">{{ $order->customer_phone }}</div>
+                        </div>
+                    </div>
+                    <div class="mb-0 d-flex align-items-start">
+                        <div class="bg-warning-subtle text-warning rounded-circle p-2 me-3" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-map-marker-alt small"></i>
+                        </div>
+                        <div>
+                            <div class="text-muted small">Địa chỉ giao hàng</div>
+                            <div class="fw-bold text-dark">
+                                {{ $order->shipping_address }}<br>
+                                {{ $order->ward }}, {{ $order->district }}, {{ $order->city }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 fw-bold text-muted small text-uppercase">Xử lý đơn hàng</h6>
+                    <h6 class="mb-0 fw-bold text-muted small text-uppercase">Trạng thái đơn hàng</h6>
                     <span class="badge rounded-pill bg-{{ $order->status == 'completed' ? 'success' : ($order->status == 'pending' ? 'warning' : 'danger') }} py-2 px-3">
                         {{ $order->status == 'completed' ? 'Hoàn thành' : ($order->status == 'pending' ? 'Đang chờ' : 'Đã hủy') }}
                     </span>
@@ -125,7 +138,7 @@
                         @csrf
                         @method('PATCH')
                         <div class="mb-3">
-                            <label class="form-label small fw-bold text-muted">Thay đổi trạng thái:</label>
+                            <label class="form-label small fw-bold text-muted">Cập nhật trạng thái:</label>
                             <select name="status" class="form-select border-2 shadow-none rounded-3">
                                 <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Chờ xử lý</option>
                                 <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>Đã hoàn thành</option>
@@ -133,7 +146,7 @@
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm rounded-3">
-                            <i class="fas fa-check-circle me-2"></i>Lưu cập nhật
+                            <i class="fas fa-check-circle me-2"></i>Lưu thay đổi
                         </button>
                     </form>
                 </div>
@@ -141,14 +154,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    /* Một chút CSS để giao diện mượt mà hơn */
-    .bg-primary-subtle { background-color: #e7f1ff; }
-    .bg-success-subtle { background-color: #e6fffa; }
-    .tracking-wider { letter-spacing: 0.05em; }
-    .font-monospace { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; }
-    .card { transition: transform 0.2s ease; }
-    .rounded-4 { border-radius: 1rem !important; }
-</style>
 @endsection
