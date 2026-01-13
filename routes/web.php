@@ -6,7 +6,6 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\MailController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\OrderController;
@@ -79,6 +78,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/process', [CheckoutController::class, 'process'])->name('process');
         Route::get('/success/{orderId}', [CheckoutController::class, 'success'])->name('success');
     });
+
+    // Lịch sử đơn hàng dành cho khách hàng
+    Route::get('/order-history', [CheckoutController::class, 'history'])->name('order.history');
 });
 
 /*
@@ -95,25 +97,10 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/products/thong-ke', [ProductController::class, 'thongke'])->name('products.thongke');
     Route::resource('products', ProductController::class);
 
-    // 3. Quản lý Lịch sử giao dịch (Đã sửa ở đây)
-    Route::prefix('orders')->name('orders.')->group(function () {
-        Route::get('/', [OrderController::class, 'index'])->name('index'); // admin.orders.index
-        Route::get('/{id}', [OrderController::class, 'show'])->name('show');   // admin.orders.show
-    });
-});
-
-/*
-|--------------------------------------------------------------------------
-| MAIL & UTILS
-|--------------------------------------------------------------------------
-*/
-// Tìm và xóa 3 dòng cuối file web.php cũ của bạn, sau đó thay bằng cụm này:
-Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+    // 3. Quản lý Đơn hàng (Admin)
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('index');
         Route::get('/{id}', [OrderController::class, 'show'])->name('show');
-        
-        // Thêm dòng này để sửa lỗi "updateStatus not defined"
         Route::patch('/{id}/update-status', [OrderController::class, 'updateStatus'])->name('updateStatus');
     });
 });
