@@ -8,7 +8,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\Admin\OrderController;
+// Sửa lại: Nếu bạn dùng CheckoutController để quản lý đơn hàng luôn thì không cần gọi OrderController riêng lẻ
+// Ở đây tôi dùng CheckoutController cho thống nhất với yêu cầu trước đó của bạn.
 
 /*
 |--------------------------------------------------------------------------
@@ -26,14 +27,12 @@ Route::get('/', function () {
 */
 Route::middleware('guest')->group(function () {
     Route::get('/landing', fn() => view('auth.landing'))->name('landing');
-    
-    // Login & Register
+
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
     Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
-    
-    // OTP
+
     Route::get('/verify-otp', [RegisterController::class, 'showVerifyOtpForm'])->name('otp.view');
     Route::post('/verify-otp', [RegisterController::class, 'verifyOtp'])->name('otp.verify');
     Route::post('/resend-otp', [RegisterController::class, 'resendOtp'])->name('otp.resend');
@@ -47,10 +46,8 @@ Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-    // Chuyển hướng home mặc định
     Route::get('/home', fn() => redirect()->route('shop.index'))->name('home');
 
-    // Shop & Product Detail
     Route::get('/shop', function () {
         $categories = Product::all()->groupBy('brand');
         return view('client.index', compact('categories'));
@@ -63,7 +60,6 @@ Route::middleware('auth')->group(function () {
         return view('shop.category', compact('products', 'id'));
     })->name('shop.category');
 
-    // Cart
     Route::prefix('cart')->name('cart.')->group(function () {
         Route::get('/', [CartController::class, 'index'])->name('index');
         Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
@@ -72,14 +68,12 @@ Route::middleware('auth')->group(function () {
         Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
     });
 
-    // Checkout
     Route::prefix('checkout')->name('checkout.')->group(function () {
         Route::get('/', [CheckoutController::class, 'index'])->name('index');
         Route::post('/process', [CheckoutController::class, 'process'])->name('process');
         Route::get('/success/{orderId}', [CheckoutController::class, 'success'])->name('success');
     });
 
-    // Lịch sử đơn hàng dành cho khách hàng
     Route::get('/order-history', [CheckoutController::class, 'history'])->name('order.history');
 });
 
@@ -89,7 +83,7 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
-    
+
     // 1. Dashboard
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
@@ -97,10 +91,16 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/products/thong-ke', [ProductController::class, 'thongke'])->name('products.thongke');
     Route::resource('products', ProductController::class);
 
-    // 3. Quản lý Đơn hàng (Admin)
+    // 3. Quản lý Đơn hàng (ĐÃ ĐỒNG BỘ TÊN HÀM ĐỂ HẾT LỖI 500/404)
     Route::prefix('orders')->name('orders.')->group(function () {
-        Route::get('/', [OrderController::class, 'index'])->name('index');
-        Route::get('/{id}', [OrderController::class, 'show'])->name('show');
-        Route::patch('/{id}/update-status', [OrderController::class, 'updateStatus'])->name('updateStatus');
+        // Sửa 'index' thành 'adminOrders' hoặc 'adminIndex' tùy theo Controller của bạn
+        // Để khớp với lỗi trong ảnh của bạn, tôi sử dụng 'adminOrders'
+        Route::get('/', [CheckoutController::class, 'adminOrders'])->name('index');
+
+        // Sửa hàm show chi tiết
+        Route::get('/{id}', [CheckoutController::class, 'adminOrderDetail'])->name('show');
+
+        // Thêm route cập nhật trạng thái đơn hàng
+        Route::post('/{id}/update-status', [CheckoutController::class, 'updateStatus'])->name('updateStatus');
     });
 });
