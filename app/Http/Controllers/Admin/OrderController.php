@@ -5,18 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order; 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // Dùng để quản lý giao dịch database
 
 class OrderController extends Controller
 {
     /**
-     * Hiển thị danh sách đơn hàng (Phân trang 10 dòng/trang)
+     * Hiển thị danh sách đơn hàng
      */
     public function index() 
     {
-        // Sử dụng Eager Loading để tránh lỗi N+1 (tối ưu tốc độ tải trang)
+        // Lấy danh sách đơn hàng mới nhất
         $orders = Order::latest()->paginate(10);
-        
         return view('admin.orders.index', compact('orders'));
     }
 
@@ -25,34 +23,37 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        // Eager loading 'items' để lấy danh sách sản phẩm cùng lúc với đơn hàng
-        $order = Order::with('items')->findOrFail($id);
+        // Phải dùng 'orderItems' (hoặc đúng tên hàm bạn đặt trong Model Order)
+        // Load thêm 'product' bên trong orderItems để hiện tên/ảnh sản phẩm
+        $order = Order::with('orderItems.product')->findOrFail($id);
         
         return view('admin.orders.show', compact('order'));
     }
 
     /**
-     * Cập nhật trạng thái đơn hàng (Sửa lỗi Route not defined)
+     * Cập nhật trạng thái đơn hàng
      */
     public function updateStatus(Request $request, $id)
     {
-        // Kiểm tra dữ liệu đầu vào (Validation) để đảm bảo an toàn dữ liệu
         $request->validate([
-            'status' => 'required|in:pending,completed,cancelled' // Chỉ chấp nhận các giá trị này
+            'status' => 'required|in:pending,processing,completed,cancelled'
         ]);
 
         try {
             $order = Order::findOrFail($id);
             
-            // Sử dụng update() để ghi đè trạng thái mới từ form
-            $order->update([
-                'status' => $request->status
-            ]);
+            $data = ['status' => $request->status];
+
+            // Logic thêm: Nếu đơn hàng hoàn thành, tự động cập nhật đã thanh toán (tùy chọn)
+            if ($request->status === 'completed') {
+                $data['payment_status'] = 'paid';
+            }
+
+            $order->update($data);
 
             return redirect()->back()->with('success', 'Đã cập nhật trạng thái đơn hàng thành công!');
         } catch (\Exception $e) {
-            // Nếu có lỗi (VD: DB lỗi), quay lại và thông báo
-            return redirect()->back()->with('error', 'Có lỗi xảy ra, vui lòng thử lại sau.');
+            return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
 }
