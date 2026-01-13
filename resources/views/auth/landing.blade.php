@@ -85,7 +85,6 @@
             }
         }
 
-        /* Thứ tự chữ mới */
         .sub-title-top {
             color: #dc2626;
             font-size: 14px;
